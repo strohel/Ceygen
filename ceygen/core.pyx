@@ -17,8 +17,8 @@ cdef extern from "eigen_cpp.h":
 
 
 @cython.boundscheck(False)
-cdef double dotvv(double[:] x, double[:] y) except -1.:
-    cdef VectorMap[double] x_map, y_map
+cdef dtype dotvv(dtype[:] x, dtype[:] y) except *:
+    cdef VectorMap[dtype] x_map, y_map
     x_map.init(&x[0], x.shape[0])
     y_map.init(&y[0], y.shape[0])
     return x_map.dot(y_map)
