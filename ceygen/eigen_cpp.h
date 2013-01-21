@@ -2,6 +2,11 @@
  * Distributed under the terms of the GNU General Public License v2 or any
  * later version of the license, at your option. */
 
+#include <stdexcept>
+// make Eigen raise an exception instead of aborting on assert failure. Cython converts
+// std::runtime_error to Python RuntimeError
+#define eigen_assert(statement) do { if(!(statement)) throw std::runtime_error(#statement " does not hold (in Eigen)"); } while(0)
+
 #include <Eigen/Core>
 
 using namespace Eigen;
