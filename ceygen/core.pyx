@@ -3,7 +3,7 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
-cdef extern from "eigen.h":
+cdef extern from "eigen_cpp.h":
     cdef cppclass VectorMap[Scalar]:
         VectorMap() nogil
         void init(Scalar *, int) nogil

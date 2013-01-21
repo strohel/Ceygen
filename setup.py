@@ -8,7 +8,7 @@ from distutils.core import setup
 from Cython.Build import cythonize
 from Cython.Build.Dependencies import create_extension_list
 
-modules = create_extension_list('ceygen/*.pyx')
+modules = create_extension_list(['ceygen/*.pyx', 'ceygen/tests/*.pyx'])
 for module in modules:
     module.language = "c++"
 
@@ -17,4 +17,6 @@ for module in modules:
     module.include_dirs.append('/usr/include/eigen3')
     module.extra_compile_args.append('-Wall')
 
-setup(name='Ceygen', ext_modules=modules)
+setup(name='Ceygen',
+      packages=['ceygen', 'ceygen.tests'],
+      ext_modules=modules)

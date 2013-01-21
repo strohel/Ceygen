@@ -10,8 +10,12 @@ template<typename dtype>
 class VectorMap : public Map<Matrix<dtype, Dynamic, 1> >
 {
 	public:
-		VectorMap() : Map<Matrix<dtype, Dynamic, 1> >(0, 0) {};
-		void init(dtype *data, int rows) {};
+		VectorMap() : Map<Matrix<dtype, Dynamic, 1> >(0, 0) {}
+		void init(dtype *data, int rows) {
+			// see http://eigen.tuxfamily.org/dox/TutorialMapClass.html
+			// this is NOT a heap allocation:
+			new (this) Map<Matrix<dtype, Dynamic, 1> >(data, rows);
+		};
 };
 
 template<typename dtype>
@@ -19,5 +23,7 @@ class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic> >
 {
 	public:
 		MatrixMap() : Map<Matrix<dtype, Dynamic, Dynamic> >(0, 0, 0) {};
-		void init(dtype *data, int rows, int cols) {};
+		void init(dtype *data, int rows, int cols) {
+			new (this) Map<Matrix<dtype, Dynamic, Dynamic> >(data, rows, cols);
+		};
 };
