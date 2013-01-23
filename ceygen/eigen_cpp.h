@@ -10,6 +10,10 @@
 #include <Eigen/Core>
 #include <Python.h>
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 using namespace Eigen;
 
 /**
@@ -17,16 +21,23 @@ using namespace Eigen;
  * Cython late-initialize the map using init() method
  */
 template<typename dtype>
-class VectorMap : public Map<Matrix<dtype, Dynamic, 1> >
+class VectorMap : public Map<Matrix<dtype, Dynamic, 1>, Unaligned, Stride<0, Dynamic> >
 {
 	public:
-		typedef Map<Matrix<dtype, Dynamic, 1> > Base;
+		typedef Stride<0, Dynamic> StrideType;
+		typedef Map<Matrix<dtype, Dynamic, 1>, Unaligned, StrideType> Base;
 
-		VectorMap() : Base(0, 0) {}
-		inline void init(dtype *data, Py_ssize_t *shape) {
+		VectorMap() : Base(0, 0, StrideType(0, 0)) {}
+		inline void init(dtype *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
 			// see http://eigen.tuxfamily.org/dox/TutorialMapClass.html
-			// this is NOT a heap allocation:
-			new (this) Base(data, shape[0]);
+			// this is NOT a heap allocation
+			// Cython has strides in bytes, Eigen in dtype-long units:
+			new (this) Base(data, shape[0], StrideType(0, strides[0]/sizeof(dtype)));
+#			ifdef DEBUG
+				std::cerr << __PRETTY_FUNCTION__ << " shape=" << shape[0]
+				          << " strides=" << strides[0]/sizeof(dtype) << std::endl
+				          << *this << std::endl;
+#			endif
 		};
 
 		template<typename T>
@@ -41,14 +52,20 @@ class VectorMap : public Map<Matrix<dtype, Dynamic, 1> >
  * @see VectorMap
  */
 template<typename dtype>
-class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor> >
+class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Unaligned, Stride<Dynamic, Dynamic> >
 {
 	public:
-		typedef Map<Matrix<dtype, Dynamic, Dynamic, RowMajor> > Base;
+		typedef Stride<Dynamic, Dynamic> StrideType;
+		typedef Map<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Unaligned, StrideType> Base;
 
-		MatrixMap() : Base(0, 0, 0) {};
-		inline void init(dtype *data, const Py_ssize_t *shape) {
-			new (this) Base(data, shape[0], shape[1]);
+		MatrixMap() : Base(0, 0, 0, StrideType(0, 0)) {};
+		inline void init(dtype *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
+			new (this) Base(data, shape[0], shape[1], StrideType(strides[0]/sizeof(dtype), strides[1]/sizeof(dtype)));
+#			ifdef DEBUG
+				std::cerr << __PRETTY_FUNCTION__ << " shape=" << shape[0] << ", " << shape[1]
+				          << " strides=" << strides[0]/sizeof(dtype) << ", " << strides[1]/sizeof(dtype) << std::endl
+				          << *this << std::endl;
+#			endif
 		};
 
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(MatrixMap)
