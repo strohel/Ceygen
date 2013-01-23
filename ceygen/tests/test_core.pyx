@@ -20,6 +20,21 @@ class TestCore(CeygenTestCase):
         cdef double[:] y = y_np
         self.assertAlmostEqual(c.dotvv(x, y), 32.)
 
+    def test_dotvv_strides(self):
+        x = np.array([[1., 2.], [3., 4.]])
+        e1 = np.array([1., 0.])
+        e2 = np.array([0., 1.])
+
+        self.assertAlmostEqual(c.dotvv(x[0, :], e1), 1.)
+        self.assertAlmostEqual(c.dotvv(x[0, :], e2), 2.)
+        self.assertAlmostEqual(c.dotvv(x[1, :], e1), 3.)
+        self.assertAlmostEqual(c.dotvv(x[1, :], e2), 4.)
+
+        self.assertAlmostEqual(c.dotvv(x[:, 0], e1), 1.)
+        self.assertAlmostEqual(c.dotvv(x[:, 0], e2), 3.)
+        self.assertAlmostEqual(c.dotvv(x[:, 1], e1), 2.)
+        self.assertAlmostEqual(c.dotvv(x[:, 1], e2), 4.)
+
     def test_dotvv_baddims(self):
         x = np.array([1., 2., 3.])
         y = np.array([4., 5.])
@@ -64,6 +79,26 @@ class TestCore(CeygenTestCase):
         y_np = np.array([4., 5.])
         self.assertApproxEqual(c.dotmv(x_np.T, y_np), np.array([19., 18., 17.]))
 
+    def test_dotmv_strides(self):
+        big = np.array([[[1., 2.], [3., 4.]],
+                        [[5., 6.], [7., 8.]]])
+        e1 = np.array([1., 0.])
+        e2 = np.array([0., 1.])
+        self.assertApproxEqual(c.dotmv(big[0, :, :], e1), np.array([1., 3.]))
+        self.assertApproxEqual(c.dotmv(big[0, :, :], e2), np.array([2., 4.]))
+        self.assertApproxEqual(c.dotmv(big[1, :, :], e1), np.array([5., 7.]))
+        self.assertApproxEqual(c.dotmv(big[1, :, :], e2), np.array([6., 8.]))
+
+        self.assertApproxEqual(c.dotmv(big[:, 0, :], e1), np.array([1., 5.]))
+        self.assertApproxEqual(c.dotmv(big[:, 0, :], e2), np.array([2., 6.]))
+        self.assertApproxEqual(c.dotmv(big[:, 1, :], e1), np.array([3., 7.]))
+        self.assertApproxEqual(c.dotmv(big[:, 1, :], e2), np.array([4., 8.]))
+
+        self.assertApproxEqual(c.dotmv(big[:, :, 0], e1), np.array([1., 5.]))
+        self.assertApproxEqual(c.dotmv(big[:, :, 0], e2), np.array([3., 7.]))
+        self.assertApproxEqual(c.dotmv(big[:, :, 1], e1), np.array([2., 6.]))
+        self.assertApproxEqual(c.dotmv(big[:, :, 1], e2), np.array([4., 8.]))
+
     def test_dotmv_baddims(self):
         def dotmv(x, y, out=None):
             return c.dotmv(x, y, out)
@@ -80,13 +115,15 @@ class TestCore(CeygenTestCase):
 
     def test_dotmv_none(self):
         x, y, out = np.array([[3.]]), np.array([2.]), np.zeros(1)
-        def dotmv(x, y, out=None):
-            return c.dotmv(x, y, out)
-        self.assertRaises(StandardError, dotmv, x, None)
-        self.assertRaises(StandardError, dotmv, x, None, out)
-        self.assertRaises(StandardError, dotmv, x, "Hello")
-        self.assertRaises(StandardError, dotmv, x, "Hello", out)
-        self.assertRaises(StandardError, dotmv, None, y)
-        self.assertRaises(StandardError, dotmv, None, y, out)
-        self.assertRaises(StandardError, dotmv, "Hello", y)
-        self.assertRaises(StandardError, dotmv, "Hello", out)
+        for X in (x, None):
+            for Y in (y, None):
+                for out in (None, out):
+                    if X is x and Y is y:
+                        continue  # this case would be valid
+                    try:
+                        c.dotmv(X, Y, out)
+                    except StandardError as e:
+                        #print e
+                        pass
+                    else:
+                        self.fail("StandardError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
