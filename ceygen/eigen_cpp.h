@@ -8,6 +8,7 @@
 #define eigen_assert(statement) do { if(!(statement)) throw std::runtime_error(#statement " does not hold (in Eigen)"); } while(0)
 
 #include <Eigen/Core>
+#include <Python.h>
 
 using namespace Eigen;
 
@@ -22,10 +23,10 @@ class VectorMap : public Map<Matrix<dtype, Dynamic, 1> >
 		typedef Map<Matrix<dtype, Dynamic, 1> > Base;
 
 		VectorMap() : Base(0, 0) {}
-		inline void init(dtype *data, int rows) {
+		inline void init(dtype *data, Py_ssize_t *shape) {
 			// see http://eigen.tuxfamily.org/dox/TutorialMapClass.html
 			// this is NOT a heap allocation:
-			new (this) Base(data, rows);
+			new (this) Base(data, shape[0]);
 		};
 
 		template<typename T>
@@ -46,8 +47,8 @@ class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor> >
 		typedef Map<Matrix<dtype, Dynamic, Dynamic, RowMajor> > Base;
 
 		MatrixMap() : Base(0, 0, 0) {};
-		inline void init(dtype *data, int rows, int cols) {
-			new (this) Base(data, rows, cols);
+		inline void init(dtype *data, const Py_ssize_t *shape) {
+			new (this) Base(data, shape[0], shape[1]);
 		};
 
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(MatrixMap)
