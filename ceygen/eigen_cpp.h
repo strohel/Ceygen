@@ -11,24 +11,44 @@
 
 using namespace Eigen;
 
+/**
+ * Very simple Eigen::Map<> subclass that provides default constructor and lets
+ * Cython late-initialize the map using init() method
+ */
 template<typename dtype>
 class VectorMap : public Map<Matrix<dtype, Dynamic, 1> >
 {
 	public:
-		VectorMap() : Map<Matrix<dtype, Dynamic, 1> >(0, 0) {}
-		void init(dtype *data, int rows) {
+		typedef Map<Matrix<dtype, Dynamic, 1> > Base;
+
+		VectorMap() : Base(0, 0) {}
+		inline void init(dtype *data, int rows) {
 			// see http://eigen.tuxfamily.org/dox/TutorialMapClass.html
 			// this is NOT a heap allocation:
-			new (this) Map<Matrix<dtype, Dynamic, 1> >(data, rows);
+			new (this) Base(data, rows);
 		};
+
+		template<typename T>
+		inline void noalias_assign(const T &rhs) {
+			this->noalias() = rhs;
+		}
+
+		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(VectorMap)
 };
 
+/**
+ * @see VectorMap
+ */
 template<typename dtype>
-class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic> >
+class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor> >
 {
 	public:
-		MatrixMap() : Map<Matrix<dtype, Dynamic, Dynamic> >(0, 0, 0) {};
-		void init(dtype *data, int rows, int cols) {
-			new (this) Map<Matrix<dtype, Dynamic, Dynamic> >(data, rows, cols);
+		typedef Map<Matrix<dtype, Dynamic, Dynamic, RowMajor> > Base;
+
+		MatrixMap() : Base(0, 0, 0) {};
+		inline void init(dtype *data, int rows, int cols) {
+			new (this) Base(data, rows, cols);
 		};
+
+		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(MatrixMap)
 };
