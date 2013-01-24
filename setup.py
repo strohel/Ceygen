@@ -7,13 +7,9 @@
 from Cython.Build import cythonize
 from Cython.Build.Dependencies import create_extension_list
 
-from distutils.cmd import Command
 from distutils.core import setup
-from distutils.errors import DistutilsExecError
 
-from os.path import abspath, dirname, join
-import sys
-import unittest
+from support.dist_cmd_test import test
 
 modules = create_extension_list(['ceygen/*.pyx', 'ceygen/tests/*.pyx'])
 for module in modules:
@@ -23,35 +19,6 @@ modules = cythonize(modules)
 for module in modules:
     module.include_dirs.append('/usr/include/eigen3')
     module.extra_compile_args.append('-Wall')
-
-class test(Command):
-    """Test Ceygen in the build directory"""
-
-    description = 'run unit test-suite of Ceygen within the build directory'
-    user_options = []
-
-    def initialize_options(self):
-        self.build_lib = None
-
-    def finalize_options(self):
-        self.set_undefined_options('build', ('build_lib', 'build_lib'))
-
-    def run(self):
-        self.run_command('build')  # build if not alredy run
-        orig_path = sys.path[:]
-        try:
-            build_path = abspath(self.build_lib)
-            sys.path.insert(0, build_path)
-            import ceygen.tests as t
-            assert dirname(t.__file__) == join(build_path, 'ceygen', 'tests')
-            suite = unittest.TestLoader().loadTestsFromModule(t)
-            result = unittest.TextTestRunner(verbosity=self.verbose).run(suite)
-            if not result.wasSuccessful():
-                raise Exception("There were test failures")
-        except Exception as e:
-            raise DistutilsExecError(e)
-        finally:
-            sys.path = orig_path
 
 setup(
     packages=['ceygen', 'ceygen.tests'],
