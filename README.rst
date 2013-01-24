@@ -68,3 +68,12 @@ On the other hand, Ceygen...
    infrastructure - implementing a new function should be rather straightforward (with
    decent Cython and C++ knowledge). We're very open to pull requests!
    (do include unit tests in them)
+ * **needs recent Cython** to compile. If this is a problem, you can distribute .cpp
+   files instead.
+
+Building
+========
+
+Ceygen uses standard Distutils to build, test and install itself, simply run
+``./setup.py build`` to build Ceygen, ``./setup.py test`` to test it (inside build
+directory) and ``./setup.py install`` to install it.
