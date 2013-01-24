@@ -10,6 +10,7 @@ from os.path import abspath, dirname, join
 import sys
 import unittest
 
+
 class test(Command):
     """Test Ceygen in the build directory"""
 

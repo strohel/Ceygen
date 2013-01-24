@@ -8,8 +8,9 @@ from Cython.Build.Dependencies import create_extension_list
 
 from distutils.core import setup
 
-from support.dist_cmd_test import test
 from support.dist_cmd_build import build
+from support.dist_cmd_clean import clean
+from support.dist_cmd_test import test
 
 
 modules = create_extension_list(['ceygen/*.pyx', 'ceygen/tests/*.pyx'])
@@ -21,7 +22,7 @@ for module in modules:
 setup(
     packages=['ceygen', 'ceygen.tests'],
     package_data={'ceygen': ['*.pxd']},
-    cmdclass = {'build': build, 'test': test},
+    cmdclass = {'build': build, 'clean': clean, 'test': test},
     ext_modules=modules,
 
     # meta-data; see http://docs.python.org/distutils/setupscript.html#additional-meta-data
