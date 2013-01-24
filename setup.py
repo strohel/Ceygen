@@ -4,26 +4,24 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
-from Cython.Build import cythonize
 from Cython.Build.Dependencies import create_extension_list
 
 from distutils.core import setup
 
 from support.dist_cmd_test import test
+from support.dist_cmd_build import build
+
 
 modules = create_extension_list(['ceygen/*.pyx', 'ceygen/tests/*.pyx'])
 for module in modules:
     module.language = "c++"
-
-modules = cythonize(modules)
-for module in modules:
     module.include_dirs.append('/usr/include/eigen3')
-    module.extra_compile_args.append('-Wall')
+    module.extra_compile_args.extend(['-O2', '-march=native', '-Wall', '-pipe'])
 
 setup(
     packages=['ceygen', 'ceygen.tests'],
     package_data={'ceygen': ['*.pxd']},
-    cmdclass = {'test': test},
+    cmdclass = {'build': build, 'test': test},
     ext_modules=modules,
 
     # meta-data; see http://docs.python.org/distutils/setupscript.html#additional-meta-data
