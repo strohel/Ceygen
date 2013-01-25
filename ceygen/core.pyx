@@ -18,13 +18,14 @@ cdef extern from "eigen_cpp.h":
         void init(Scalar *, const Py_ssize_t *, const Py_ssize_t *) nogil except +
         VectorMap[Scalar] operator*(VectorMap[Scalar]) nogil except +
 
+
 cdef str get_format(dtype *dummy):
     if dtype is double:
         return 'd'
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef dtype dotvv(dtype[:] x, dtype[:] y) except *:
+cdef dtype dotvv(dtype[:] x, dtype[:] y) nogil except *:
     cdef VectorMap[dtype] x_map, y_map
     x_map.init(&x[0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
@@ -32,12 +33,13 @@ cdef dtype dotvv(dtype[:] x, dtype[:] y) except *:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = None):
+cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef MatrixMap[dtype] x_map
     cdef VectorMap[dtype] y_map
     cdef VectorMap[dtype] out_map
     if out is None:
-        out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        with gil:
+            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
     x_map.init(&x[0, 0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
     out_map.init(&out[0], out.shape, out.strides)

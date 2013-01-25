@@ -40,7 +40,7 @@ Ceygen...
    a new type is a matter of adding 3 lines and rebuilding Ceygen.
  * **is extensively tested** - Ceygen's test suite validates every public Cython method,
    including errors raised on invalid input.
- * TODO: **is multithreading-friendly** - Every Ceygen function doesn't acquire the GIL_
+ * **is multithreading-friendly** - Every Ceygen function doesn't acquire the GIL_
    unless it needs to create a Python object (always avoidable); all functions are
    declared nogil_ so that you can call them in prange_ blocks without losing parallelism.
  * **provides descriptive error messages** - Care is taken to propagate all errors

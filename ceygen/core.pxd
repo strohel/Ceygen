@@ -7,9 +7,8 @@ ctypedef fused dtype:
 #    float
     double
 
-# TODO: add nogil:
-cdef dtype dotvv(dtype[:] x, dtype[:] y) except *
-cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = *)
+cdef dtype dotvv(dtype[:] x, dtype[:] y) nogil except *
+cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = *) nogil
 
 # TODO: implement:
 cdef dtype[:] dotvm(dtype[:] x, dtype[:, :] y) nogil
