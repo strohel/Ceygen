@@ -55,11 +55,11 @@ class TestCore(CeygenTestCase):
         self.assertRaises(StandardError, dotvv, None, x)
         self.assertRaises(StandardError, dotvv, "Hello", x)
 
+
     def test_dotmv(self):
         x_np = np.array([[1., 2., 3.], [3., 2., 1.]])
         y_np = np.array([4., 5., 6.])
         self.assertApproxEqual(c.dotmv(x_np, y_np), np.array([32., 28.]))
-        self.assertApproxEqual(c.dotmv(x_np, y_np), np.array([32., 28.]).T)
         self.assertApproxEqual(c.dotmv(x_np, y_np, None), np.array([32., 28.]))
         out_np = np.zeros(2)
         out2_np = c.dotmv(x_np, y_np, out_np)
@@ -122,6 +122,61 @@ class TestCore(CeygenTestCase):
                         continue  # this case would be valid
                     try:
                         c.dotmv(X, Y, out)
+                    except StandardError as e:
+                        #print e
+                        pass
+                    else:
+                        self.fail("StandardError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
+
+
+    def test_dotvm(self):
+        x_np = np.array([4., 5.])
+        y_np = np.array([[1., 2., 3.], [3., 2., 1.]])
+        expected = np.array([19., 18., 17.])
+        self.assertApproxEqual(c.dotvm(x_np, y_np), expected)
+        self.assertApproxEqual(c.dotvm(x_np, y_np, None), expected)
+        out_np = np.zeros(3)
+        out2_np = c.dotvm(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2_np, expected)
+
+        cdef double[:] x = x_np
+        cdef double[:, :] y = y_np
+        self.assertApproxEqual(c.dotvm(x, y), expected)
+        cdef double[:] out = out_np
+        cdef double[:] out2 = c.dotvm(x_np, y_np, out)
+        self.assertApproxEqual(out, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected)
+
+    def test_dotvm_transposed(self):
+        x_np = np.array([4., 5., 6.])
+        y_np = np.array([[1., 2., 3.], [3., 2., 1.]])
+        self.assertApproxEqual(c.dotvm(x_np, y_np.T), np.array([32., 28.]))
+
+    def test_dotvm_baddims(self):
+        def dotvm(x, y, out=None):
+            return c.dotvm(x, y, out)
+        x = np.array([1., 2.])
+        y = np.array([[1., 2., 3.],[2., 3., 4.]])
+        self.assertRaises(StandardError, dotvm, np.array([1., 2.]), np.array([1., 2.]))
+        self.assertRaises(StandardError, dotvm, x, np.array([[1., 2.], [2., 3.], [3., 4.]]))
+        self.assertRaises(StandardError, dotvm, np.array([1.]), y)
+        self.assertRaises(StandardError, dotvm, x, y.T)
+
+        # good x, y dims, but bad out dims
+        self.assertRaises(StandardError, dotvm, x, y, np.zeros(1))
+        self.assertRaises(StandardError, dotvm, x, y, np.zeros(2))
+        self.assertRaises(StandardError, dotvm, x, y, np.zeros(4))
+
+    def test_dotvm_none(self):
+        x, y, out = np.array([3.]), np.array([[2.]]), np.zeros(1)
+        for X in (x, None):
+            for Y in (y, None):
+                for out in (None, out):
+                    if X is x and Y is y:
+                        continue  # this case would be valid
+                    try:
+                        c.dotvm(X, Y, out)
                     except StandardError as e:
                         #print e
                         pass

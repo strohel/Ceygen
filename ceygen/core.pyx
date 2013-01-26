@@ -10,13 +10,21 @@ cdef extern from "eigen_cpp.h":
     cdef cppclass VectorMap[Scalar]:
         VectorMap() nogil except +
         void init(Scalar *, const Py_ssize_t *, const Py_ssize_t *) nogil except +
-        Scalar dot(const VectorMap[Scalar] &other) nogil except +
-        void noalias_assign(const VectorMap[Scalar] &other) nogil except +
+        # note: Cython doesn't like VectorMap[Scalar] anywhere except in cdef cppclass ...
+        # declaration. Using just the class without template param everywhere else works
+        # well
+        VectorMap transpose() nogil
+
+        Scalar dot(VectorMap) nogil except +
+        VectorMap operator*(MatrixMap) nogil except +
+        void noalias_assign(VectorMap) nogil except +
 
     cdef cppclass MatrixMap[Scalar]:
         MatrixMap() nogil
         void init(Scalar *, const Py_ssize_t *, const Py_ssize_t *) nogil except +
-        VectorMap[Scalar] operator*(VectorMap[Scalar]) nogil except +
+        MatrixMap transpose() nogil
+
+        VectorMap operator*(VectorMap) nogil except +
 
 
 cdef str get_format(dtype *dummy):
@@ -46,8 +54,22 @@ cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = None) nogil:
     out_map.noalias_assign(x_map * y_map)
     return out
 
-cdef dtype[:] dotvm(dtype[:] x, dtype[:, :] y) nogil:
-    pass
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype[:] dotvm(dtype[:] x, dtype[:, :] y, dtype[:] out = None) nogil:
+    # we coul've just called dotmv(y.T, x, out), but y.T segfaults if y is uninitialized
+    # memoryview, also we fear overhead in memoryview.transpose() and another function call
+    cdef VectorMap[dtype] x_map
+    cdef MatrixMap[dtype] y_map
+    cdef VectorMap[dtype] out_map
+    if out is None:
+        with gil:
+            out = view.array(shape=(y.shape[1],), itemsize=sizeof(dtype), format=get_format(&y[0, 0]))
+    x_map.init(&x[0], x.shape, x.strides)
+    y_map.init(&y[0, 0], y.shape, y.strides)
+    out_map.init(&out[0], out.shape, out.strides)
+    out_map.noalias_assign(x_map.transpose() * y_map)
+    return out
 
 cdef dtype[:, :] dotmm(dtype[:, :] x, dtype[:, :] y) nogil:
     pass
