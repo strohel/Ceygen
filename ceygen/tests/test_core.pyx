@@ -214,6 +214,17 @@ class TestCore(CeygenTestCase):
         self.assertApproxEqual(out, expected[0])
         self.assertApproxEqual(out_np, expected[0])
 
+    def test_dotmm_strides(self):
+        big = np.array([[[1., 2.], [3., 4.]],
+                        [[5., 6.], [7., 8.]]])
+        eye = np.eye(2)
+        self.assertApproxEqual(c.dotmm(big[0, :, :], eye), big[0, :, :])
+        self.assertApproxEqual(c.dotmm(big[1, :, :], eye), big[1, :, :])
+        self.assertApproxEqual(c.dotmm(big[:, 0, :], eye), big[:, 0, :])
+        self.assertApproxEqual(c.dotmm(big[:, 1, :], eye), big[:, 1, :])
+        self.assertApproxEqual(c.dotmm(big[:, :, 0], eye), big[:, :, 0])
+        self.assertApproxEqual(c.dotmm(big[:, :, 1], eye), big[:, :, 1])
+
     def test_dotmm_baddims(self):
         x = np.array([[1., 2.],
                       [3., 4.]])
