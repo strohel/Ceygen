@@ -177,8 +177,75 @@ class TestCore(CeygenTestCase):
                         continue  # this case would be valid
                     try:
                         c.dotvm(X, Y, out)
-                    except StandardError as e:
-                        #print e
+                    except StandardError:
                         pass
                     else:
                         self.fail("StandardError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
+
+    def test_dotmm(self):
+        x_np = np.array([[1., 2.],
+                         [3., 4.]])
+        y_np = np.array([[5., 6.],
+                         [7., 8.]])
+        expected = [
+            np.array([[19., 22.], [43., 50.]]),
+            np.array([[26., 30.], [38., 44.]]),
+            np.array([[17., 23.], [39., 53.]]),
+            np.array([[23., 31.], [34., 46.]])
+        ]
+
+        self.assertApproxEqual(c.dotmm(x_np, y_np), expected[0])
+        self.assertApproxEqual(c.dotmm(x_np.T, y_np), expected[1])
+        self.assertApproxEqual(c.dotmm(x_np, y_np.T), expected[2])
+        self.assertApproxEqual(c.dotmm(x_np.T, y_np.T), expected[3])
+
+        cdef double[:, :] x = x_np
+        cdef double[:, :] y = y_np
+        self.assertApproxEqual(c.dotmm(x, y), expected[0])
+        self.assertApproxEqual(c.dotmm(x.T, y), expected[1])
+        self.assertApproxEqual(c.dotmm(x, y.T), expected[2])
+        self.assertApproxEqual(c.dotmm(x.T, y.T), expected[3])
+
+        # test that it actually uses out
+        out_np = np.empty((2, 2))
+        cdef double[:, :] out = out_np
+        out2 = c.dotmm(x, y, out)
+        self.assertApproxEqual(out2, expected[0])
+        self.assertApproxEqual(out, expected[0])
+        self.assertApproxEqual(out_np, expected[0])
+
+    def test_dotmm_baddims(self):
+        x = np.array([[1., 2.],
+                      [3., 4.]])
+        y = np.array([[5., 6.],
+                      [7., 8.]])
+        out = np.empty((2, 2))
+        for X in (x, np.array([1., 2.]), np.array([[1.], [2.]]), np.array([[[1.]]])):
+            for Y in (y, np.array([1., 2.]), np.array([[1.], [2.]]), np.array([[[1.]]])):
+                for OUT in (out, None, np.empty((2,)), np.empty((2, 3)), np.empty((3, 2)), np.empty((2, 2, 1))):
+                    if X is x and Y is y and (OUT is out or OUT is None):
+                        continue  # these would be valid
+                    try:
+                        c.dotmm(X, Y, OUT)
+                    except StandardError:
+                        pass
+                    else:
+                        self.fail("StandardError was not raised (X={0}, Y={1}, OUT={2}".format(X, Y, OUT))
+
+    def test_dotmm_none(self):
+        x = np.array([[1., 2.],
+                      [3., 4.]])
+        y = np.array([[5., 6.],
+                      [7., 8.]])
+        out = np.empty((2, 2))
+        for X in (x, None):
+            for Y in (y, None):
+                for OUT in (out, None):
+                    if X is x and Y in y:
+                        continue  # this would be valid
+                    try:
+                        c.dotmm(X, Y, OUT)
+                    except StandardError:
+                        pass
+                    else:
+                        self.fail("StandardError was not raised (X={0}, Y={1}, OUT={2}".format(X, Y, OUT))

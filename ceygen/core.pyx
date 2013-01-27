@@ -25,6 +25,8 @@ cdef extern from "eigen_cpp.h":
         MatrixMap transpose() nogil
 
         VectorMap operator*(VectorMap) nogil except +
+        MatrixMap operator*(MatrixMap) nogil except +
+        void noalias_assign(MatrixMap) nogil except +
 
 
 cdef str get_format(dtype *dummy):
@@ -71,5 +73,15 @@ cdef dtype[:] dotvm(dtype[:] x, dtype[:, :] y, dtype[:] out = None) nogil:
     out_map.noalias_assign(x_map.transpose() * y_map)
     return out
 
-cdef dtype[:, :] dotmm(dtype[:, :] x, dtype[:, :] y) nogil:
-    pass
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype[:, :] dotmm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
+    cdef MatrixMap[dtype] x_map, y_map, out_map
+    if out is None:
+        with gil:
+            out = view.array(shape=(x.shape[1],y.shape[0]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+    x_map.init(&x[0, 0], x.shape, x.strides)
+    y_map.init(&y[0, 0], y.shape, y.strides)
+    out_map.init(&out[0, 0], out.shape, out.strides)
+    out_map.noalias_assign(x_map * y_map)
+    return out

@@ -68,5 +68,10 @@ class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Unaligne
 #			endif
 		};
 
+		template<typename T>
+		inline void noalias_assign(const T &rhs) {
+			this->noalias() = rhs;
+		}
+
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(MatrixMap)
 };
