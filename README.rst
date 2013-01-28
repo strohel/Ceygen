@@ -61,9 +61,10 @@ Ceygen...
 
 On the other hand, Ceygen...
 
- * **depends on Eigen**. Ceygen expects *Eigen 3* headers to be installed under
-   ``/usr/lib/eigen3``. Installing Eigen is a matter of unpacking it, because it is
-   a pure template library defined solely in the headers.
+ * **depends on Eigen build-time**. Ceygen expects *Eigen 3* headers to be installed under
+   ``/usr/lib/eigen3`` when it is being built. Installing Eigen is a matter of unpacking
+   it, because it is a pure template library defined solely in the headers. Ceygen doesn't
+   reference Eigen at all at runtime because all code is complited in.
  * **still provides a very little subset of Eigen functionality**. We add new functions
    only as we need them in another projects, but we believe that the hard part is the
    infrastructure - implementing a new function should be rather straightforward (with
