@@ -21,7 +21,7 @@ import sys, os
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.1'
+needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -247,13 +247,3 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
-
-
-# Options for autodoc
-autoclass_content = "both" # options are: both (concat class and __init__ docs), class
-autodoc_member_order = "bysource"
-autodoc_default_flags = [
-    "members",  # when autodocumenting module, class, recursively document its members
-    "show-inheritance",
-    "private-members",
-]
