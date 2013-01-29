@@ -46,7 +46,8 @@ class TestElemwise(CeygenTestCase):
             for Y in (y, np.array([[1., 2., 3., 4.]]), np.array([[1.], [2.], [3.], [4.]])):
                 for OUT in (out, np.empty((1, 2)), np.empty((3, 1)), np.empty((1, 4))):
                     if X is x and Y is y and OUT is out:
-                        continue  # this would be valid
+                        e.add_mm(X, Y, OUT)  # this should be valid
+                        continue
                     with self.assertRaises(ValueError):
                         e.add_mm(X, Y, OUT)
 
@@ -57,7 +58,8 @@ class TestElemwise(CeygenTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    continue  # this would be valid
+                    e.add_mm(X, Y)  # this should be valid
+                    continue
                 with self.assertRaises(ValueError):
                     e.add_mm(X, Y)
 
@@ -96,7 +98,8 @@ class TestElemwise(CeygenTestCase):
             for Y in (y, np.array([[1., 2., 3., 4.]]), np.array([[1.], [2.], [3.], [4.]])):
                 for OUT in (out, np.empty((1, 2)), np.empty((3, 1)), np.empty((1, 4))):
                     if X is x and Y is y and OUT is out:
-                        continue  # this would be valid
+                        e.subtract_mm(X, Y, OUT)  # this should be valid
+                        continue
                     with self.assertRaises(ValueError):
                         e.subtract_mm(X, Y, OUT)
 
@@ -107,6 +110,7 @@ class TestElemwise(CeygenTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    continue  # this would be valid
+                    e.subtract_mm(X, Y)  # this should be valid
+                    continue
                 with self.assertRaises(ValueError):
                     e.subtract_mm(X, Y)
