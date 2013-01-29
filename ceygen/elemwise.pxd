@@ -3,7 +3,6 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
-"""Ceygen's tests"""
+from dtype cimport dtype
 
-from test_core import *
-from test_elemwise import *
+cdef dtype[:, :] subtract_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = *) nogil

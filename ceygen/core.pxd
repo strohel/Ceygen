@@ -3,9 +3,7 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
-ctypedef fused dtype:
-#    float
-    double
+from dtype cimport dtype
 
 cdef dtype dotvv(dtype[:] x, dtype[:] y) nogil except *
 cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = *) nogil

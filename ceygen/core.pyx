@@ -7,11 +7,8 @@ cimport cython
 from cython cimport view
 
 from eigen_cython cimport *
+from dtype cimport get_format
 
-
-cdef str get_format(dtype *dummy):
-    if dtype is double:
-        return 'd'
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

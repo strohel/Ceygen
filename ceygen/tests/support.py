@@ -21,7 +21,6 @@ class CeygenTestCase(ut.TestCase):
         X = np.asarray(X)
         Y = np.asarray(Y)
         fuzz = 1.0e-8
-
         self.assertEqual(X.ndim, Y.ndim)
         self.assertEqual(X.shape, Y.shape)
 
