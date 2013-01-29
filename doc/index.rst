@@ -7,6 +7,7 @@ Ceygen API Documentation
 
    README
    core
+   elemwise
 
 Indices and tables
 ==================
