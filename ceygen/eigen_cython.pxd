@@ -13,6 +13,8 @@ cdef extern from "eigen_cpp.h":
         VectorMap transpose() nogil
 
         Scalar dot(VectorMap) nogil except +
+        VectorMap operator+(VectorMap) nogil except +
+        VectorMap operator-(VectorMap) nogil except +
         VectorMap operator*(MatrixMap) nogil except +
         void noalias_assign(VectorMap) nogil except +
 
