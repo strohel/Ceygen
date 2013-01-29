@@ -11,7 +11,7 @@ products as provided by the <`Eigen/Core`_> include.
 
    Cython `fused type`_, currently just a C double (Python :obj:`float`).
 
-.. function:: dotvv(x, y)
+.. function:: dot_vv(x, y)
 
    Vector-vector dot product, returns a scalar of appropriate type.
 
@@ -27,7 +27,7 @@ products as provided by the <`Eigen/Core`_> include.
             :obj:`NumPy array <numpy.ndarray>`.
    :rtype: :obj:`dtype`
 
-.. function:: dotmv(x, y[, out=None])
+.. function:: dot_mv(x, y[, out=None])
 
    Matrix-(column) vector product, returns a vector of appropriate type.
 
@@ -48,7 +48,7 @@ products as provided by the <`Eigen/Core`_> include.
             :obj:`NumPy array <numpy.ndarray>`.
    :rtype: :obj:`dtype[:] <dtype>`
 
-.. function:: dotvm(x, y[, out=None])
+.. function:: dot_vm(x, y[, out=None])
 
    (Row) vector-matrix product, returns a vector of appropriate type. This is equivalent
    to dotvm(*y*.T, *x*) because there's no distinction between row and column vectors in
@@ -73,7 +73,7 @@ products as provided by the <`Eigen/Core`_> include.
             :obj:`NumPy array <numpy.ndarray>`.
    :rtype: :obj:`dtype[:] <dtype>`
 
-.. function:: dotmm(x, y[, out=None])
+.. function:: dot_mm(x, y[, out=None])
 
    Matrix-matrix product, returns a matrix of appropriate type and dimensions. You may of
    course use this function to multiply matrices that are in fact vectors, you just need

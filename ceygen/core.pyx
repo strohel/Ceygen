@@ -12,7 +12,7 @@ from dtype cimport get_format
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef dtype dotvv(dtype[:] x, dtype[:] y) nogil except *:
+cdef dtype dot_vv(dtype[:] x, dtype[:] y) nogil except *:
     cdef VectorMap[dtype] x_map, y_map
     x_map.init(&x[0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
@@ -20,7 +20,7 @@ cdef dtype dotvv(dtype[:] x, dtype[:] y) nogil except *:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = None) nogil:
+cdef dtype[:] dot_mv(dtype[:, :] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef MatrixMap[dtype] x_map
     cdef VectorMap[dtype] y_map
     cdef VectorMap[dtype] out_map
@@ -35,7 +35,7 @@ cdef dtype[:] dotmv(dtype[:, :] x, dtype[:] y, dtype[:] out = None) nogil:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef dtype[:] dotvm(dtype[:] x, dtype[:, :] y, dtype[:] out = None) nogil:
+cdef dtype[:] dot_vm(dtype[:] x, dtype[:, :] y, dtype[:] out = None) nogil:
     # we coul've just called dotmv(y.T, x, out), but y.T segfaults if y is uninitialized
     # memoryview, also we fear overhead in memoryview.transpose() and another function call
     cdef VectorMap[dtype] x_map
@@ -52,7 +52,7 @@ cdef dtype[:] dotvm(dtype[:] x, dtype[:, :] y, dtype[:] out = None) nogil:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef dtype[:, :] dotmm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
+cdef dtype[:, :] dot_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
     cdef MatrixMap[dtype] x_map, y_map, out_map
     if out is None:
         with gil:
