@@ -5,11 +5,13 @@ Core Functions
 This module provides basic linear algebra operations such as vector and matrix
 products as provided by the <`Eigen/Core`_> include.
 
-.. module:: ceygen.core
+.. module:: ceygen.dtype
 
 .. data:: dtype
 
    Cython `fused type`_, currently just a C double (Python :obj:`float`).
+
+.. module:: ceygen.core
 
 .. function:: dot_vv(x, y)
 
@@ -71,9 +73,9 @@ products as provided by the <`Eigen/Core`_> include.
    :rtype: |matrix|
 
 
-.. |scalar| replace:: :obj:`dtype`
-.. |vector| replace:: :obj:`dtype[:] <dtype>`
-.. |matrix| replace:: :obj:`dtype[:, :] <dtype>`
+.. |scalar| replace:: :obj:`~ceygen.dtype.dtype`
+.. |vector| replace:: :obj:`dtype[:] <ceygen.dtype.dtype>`
+.. |matrix| replace:: :obj:`dtype[:, :] <ceygen.dtype.dtype>`
 .. |out| replace:: memory view to write the result to. Specifying this optional argument
    means that Ceygen doesn't have to allocate memory for the result (allocating memory
    involves acquiring the GIL_ and calling many expensive Python functions). Once
