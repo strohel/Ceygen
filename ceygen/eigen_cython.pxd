@@ -21,6 +21,7 @@ cdef extern from "eigen_cpp.h":
         void init(Scalar *, const Py_ssize_t *, const Py_ssize_t *) nogil except +
         MatrixMap transpose() nogil
 
+        MatrixMap operator+(MatrixMap) nogil except +
         MatrixMap operator-(MatrixMap) nogil except +
         VectorMap operator*(VectorMap) nogil except +
         MatrixMap operator*(MatrixMap) nogil except +
