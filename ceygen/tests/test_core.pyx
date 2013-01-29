@@ -43,17 +43,17 @@ class TestCore(CeygenTestCase):
             # wrap up because c.dotvv is cython-only (not callable from Python)
             return c.dotvv(x, y)
 
-        self.assertRaises(StandardError, dotvv, x, y)
-        self.assertRaises(StandardError, dotvv, x, z)
+        self.assertRaises(ValueError, dotvv, x, y)
+        self.assertRaises(ValueError, dotvv, x, z)
 
     def test_dotvv_none(self):
         x = np.array([1., 2., 3.])
         def dotvv(x, y):
             return c.dotvv(x, y)
-        self.assertRaises(StandardError, dotvv, x, None)
-        self.assertRaises(StandardError, dotvv, x, "Hello")
-        self.assertRaises(StandardError, dotvv, None, x)
-        self.assertRaises(StandardError, dotvv, "Hello", x)
+        self.assertRaises(ValueError, dotvv, x, None)
+        self.assertRaises(TypeError, dotvv, x, [1., 2., 3.])
+        self.assertRaises(ValueError, dotvv, None, x)
+        self.assertRaises(TypeError, dotvv, [1., 2., 3.], x)
 
 
     def test_dotmv(self):
@@ -104,14 +104,14 @@ class TestCore(CeygenTestCase):
             return c.dotmv(x, y, out)
         X = np.array([[1., 2., 3.],[2., 3., 4.]])
         y = np.array([1., 2., 3.])
-        self.assertRaises(StandardError, dotmv, np.array([1., 2.]), np.array([1., 2.]))
-        self.assertRaises(StandardError, dotmv, X, np.array([1., 2.]))
-        self.assertRaises(StandardError, dotmv, X, np.array([1.]))
-        self.assertRaises(StandardError, dotmv, X.T, y)
+        self.assertRaises(ValueError, dotmv, np.array([1., 2.]), np.array([1., 2.]))
+        self.assertRaises(ValueError, dotmv, X, np.array([1., 2.]))
+        self.assertRaises(ValueError, dotmv, X, np.array([1.]))
+        self.assertRaises(ValueError, dotmv, X.T, y)
 
         # good x, y dims, but bad out dims
-        self.assertRaises(StandardError, dotmv, X, y, np.zeros(1))
-        self.assertRaises(StandardError, dotmv, X, y, np.zeros(3))
+        self.assertRaises(ValueError, dotmv, X, y, np.zeros(1))
+        self.assertRaises(ValueError, dotmv, X, y, np.zeros(3))
 
     def test_dotmv_none(self):
         x, y, out = np.array([[3.]]), np.array([2.]), np.zeros(1)
@@ -122,11 +122,10 @@ class TestCore(CeygenTestCase):
                         continue  # this case would be valid
                     try:
                         c.dotmv(X, Y, out)
-                    except StandardError as e:
-                        #print e
+                    except ValueError:
                         pass
                     else:
-                        self.fail("StandardError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
+                        self.fail("ValueError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
 
 
     def test_dotvm(self):
@@ -158,15 +157,15 @@ class TestCore(CeygenTestCase):
             return c.dotvm(x, y, out)
         x = np.array([1., 2.])
         y = np.array([[1., 2., 3.],[2., 3., 4.]])
-        self.assertRaises(StandardError, dotvm, np.array([1., 2.]), np.array([1., 2.]))
-        self.assertRaises(StandardError, dotvm, x, np.array([[1., 2.], [2., 3.], [3., 4.]]))
-        self.assertRaises(StandardError, dotvm, np.array([1.]), y)
-        self.assertRaises(StandardError, dotvm, x, y.T)
+        self.assertRaises(ValueError, dotvm, np.array([1., 2.]), np.array([1., 2.]))
+        self.assertRaises(ValueError, dotvm, x, np.array([[1., 2.], [2., 3.], [3., 4.]]))
+        self.assertRaises(ValueError, dotvm, np.array([1.]), y)
+        self.assertRaises(ValueError, dotvm, x, y.T)
 
         # good x, y dims, but bad out dims
-        self.assertRaises(StandardError, dotvm, x, y, np.zeros(1))
-        self.assertRaises(StandardError, dotvm, x, y, np.zeros(2))
-        self.assertRaises(StandardError, dotvm, x, y, np.zeros(4))
+        self.assertRaises(ValueError, dotvm, x, y, np.zeros(1))
+        self.assertRaises(ValueError, dotvm, x, y, np.zeros(2))
+        self.assertRaises(ValueError, dotvm, x, y, np.zeros(4))
 
     def test_dotvm_none(self):
         x, y, out = np.array([3.]), np.array([[2.]]), np.zeros(1)
@@ -177,10 +176,10 @@ class TestCore(CeygenTestCase):
                         continue  # this case would be valid
                     try:
                         c.dotvm(X, Y, out)
-                    except StandardError:
+                    except ValueError:
                         pass
                     else:
-                        self.fail("StandardError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
+                        self.fail("ValueError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
 
     def test_dotmm(self):
         x_np = np.array([[1., 2.],
@@ -238,10 +237,10 @@ class TestCore(CeygenTestCase):
                         continue  # these would be valid
                     try:
                         c.dotmm(X, Y, OUT)
-                    except StandardError:
+                    except ValueError:
                         pass
                     else:
-                        self.fail("StandardError was not raised (X={0}, Y={1}, OUT={2}".format(X, Y, OUT))
+                        self.fail("ValueError was not raised (X={0}, Y={1}, OUT={2}".format(X, Y, OUT))
 
     def test_dotmm_none(self):
         x = np.array([[1., 2.],
@@ -256,7 +255,7 @@ class TestCore(CeygenTestCase):
                         continue  # this would be valid
                     try:
                         c.dotmm(X, Y, OUT)
-                    except StandardError:
+                    except ValueError:
                         pass
                     else:
-                        self.fail("StandardError was not raised (X={0}, Y={1}, OUT={2}".format(X, Y, OUT))
+                        self.fail("ValueError was not raised (X={0}, Y={1}, OUT={2}".format(X, Y, OUT))

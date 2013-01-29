@@ -19,8 +19,12 @@ products as provided by the <`Eigen/Core`_> include.
    :type x: :obj:`dtype[:] <dtype>`
    :param y: second factor
    :type y: :obj:`dtype[:] <dtype>`
-   :raises: :obj:`~exceptions.StandardError` subclass if argument dimensions don't match
-            or are otherwise invalid
+   :raises: :obj:`~exceptions.ValueError` if argument dimensions don't match or are
+            otherwise invalid.
+   :raises: :obj:`~exceptions.TypeError` if you pass an argument that doesn't support
+            buffer interface (e.g. a plain list). Use preferrably a `Cython memoryview`_
+            and resort to :obj:`Python array <array>`, `Cython array`_ or a
+            :obj:`NumPy array <numpy.ndarray>`.
    :rtype: :obj:`dtype`
 
 .. function:: dotmv(x, y[, out=None])
@@ -36,8 +40,12 @@ products as provided by the <`Eigen/Core`_> include.
                involves acquiring the GIL_ and calling many expensive Python functions).
                Once specified, it must must have correct dimensions (number of rows of *x*).
    :type out: :obj:`dtype[:] <dtype>`
-   :raises: :obj:`~exceptions.StandardError` subclass if argument dimensions don't match
-            or are otherwise invalid
+   :raises: :obj:`~exceptions.ValueError` if argument dimensions don't match or are
+            otherwise invalid.
+   :raises: :obj:`~exceptions.TypeError` if you pass an argument that doesn't support
+            buffer interface (e.g. a plain list). Use preferrably a `Cython memoryview`_
+            and resort to :obj:`Python array <array>`, `Cython array`_ or a
+            :obj:`NumPy array <numpy.ndarray>`.
    :rtype: :obj:`dtype[:] <dtype>`
 
 .. function:: dotvm(x, y[, out=None])
@@ -57,8 +65,12 @@ products as provided by the <`Eigen/Core`_> include.
                Once specified, it must must have correct dimensions (number of columns
                of *y*).
    :type out: :obj:`dtype[:] <dtype>`
-   :raises: :obj:`~exceptions.StandardError` subclass if argument dimensions don't match
-            or are otherwise invalid
+   :raises: :obj:`~exceptions.ValueError` if argument dimensions don't match or are
+            otherwise invalid.
+   :raises: :obj:`~exceptions.TypeError` if you pass an argument that doesn't support
+            buffer interface (e.g. a plain list). Use preferrably a `Cython memoryview`_
+            and resort to :obj:`Python array <array>`, `Cython array`_ or a
+            :obj:`NumPy array <numpy.ndarray>`.
    :rtype: :obj:`dtype[:] <dtype>`
 
 .. function:: dotmm(x, y[, out=None])
@@ -77,10 +89,16 @@ products as provided by the <`Eigen/Core`_> include.
                Once specified, it must must have correct dimensions (number of rows
                of *x* x number of columns of *y*).
    :type out: :obj:`dtype[:] <dtype>`
-   :raises: :obj:`~exceptions.StandardError` subclass if argument dimensions don't match
-            or are otherwise invalid
+   :raises: :obj:`~exceptions.ValueError` if argument dimensions don't match or are
+            otherwise invalid.
+   :raises: :obj:`~exceptions.TypeError` if you pass an argument that doesn't support
+            buffer interface (e.g. a plain list). Use preferrably a `Cython memoryview`_
+            and resort to :obj:`Python array <array>`, `Cython array`_ or a
+            :obj:`NumPy array <numpy.ndarray>`.
    :rtype: :obj:`dtype[:] <dtype>`
 
 .. _`Eigen/Core`: http://eigen.tuxfamily.org/dox/QuickRefPage.html#QuickRef_Headers
 .. _`fused type`: http://docs.cython.org/src/userguide/fusedtypes.html
+.. _`Cython memoryview`: http://docs.cython.org/src/userguide/memoryviews.html
+.. _`Cython array`: http://docs.cython.org/src/userguide/memoryviews.html#cython-arrays
 .. _GIL: http://docs.python.org/glossary.html#term-global-interpreter-lock
