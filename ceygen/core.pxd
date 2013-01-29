@@ -5,6 +5,7 @@
 
 from dtype cimport dtype
 
+
 cdef dtype dot_vv(dtype[:] x, dtype[:] y) nogil except *
 cdef dtype[:] dot_mv(dtype[:, :] x, dtype[:] y, dtype[:] out = *) nogil
 cdef dtype[:] dot_vm(dtype[:] x, dtype[:, :] y, dtype[:] out = *) nogil
