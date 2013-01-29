@@ -213,6 +213,15 @@ class TestCore(CeygenTestCase):
         self.assertApproxEqual(out, expected[0])
         self.assertApproxEqual(out_np, expected[0])
 
+        a_np = np.array([[1., 2., 3.], [4., 5., 6.]])
+        b_np = np.array([[1.], [2.], [3.]])
+        self.assertApproxEqual(c.dot_mm(a_np, b_np), np.array([[14.], [32.]]))
+        self.assertApproxEqual(c.dot_mm(b_np.T, a_np.T), np.array([[14., 32.]]))
+        cdef double[:, :] a = a_np
+        cdef double[:, :] b = b_np
+        self.assertApproxEqual(c.dot_mm(a, b), np.array([[14.], [32.]]))
+        self.assertApproxEqual(c.dot_mm(b.T, a.T), np.array([[14., 32.]]))
+
     def test_dot_mm_strides(self):
         big = np.array([[[1., 2.], [3., 4.]],
                         [[5., 6.], [7., 8.]]])
@@ -231,7 +240,7 @@ class TestCore(CeygenTestCase):
                       [7., 8.]])
         out = np.empty((2, 2))
         for X in (x, np.array([1., 2.]), np.array([[1.], [2.]]), np.array([[[1.]]])):
-            for Y in (y, np.array([1., 2.]), np.array([[1.], [2.]]), np.array([[[1.]]])):
+            for Y in (y, np.array([1., 2.]), np.array([[1.], [2.], [3.]]), np.array([[[1.]]])):
                 for OUT in (out, None, np.empty((2,)), np.empty((2, 3)), np.empty((3, 2)), np.empty((2, 2, 1))):
                     if X is x and Y is y and (OUT is out or OUT is None):
                         continue  # these would be valid
