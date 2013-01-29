@@ -78,7 +78,20 @@ Building
 
 Ceygen uses standard Distutils to build, test and install itself, simply run
 ``./setup.py build`` to build Ceygen, ``./setup.py test`` to test it (inside build
-directory) and ``./setup.py install`` to install it.
+directory) and ``./setup.py install`` to install it. If you want to clean generated
+object, .cpp and .html files (perhaps to force recompilation), simply run
+``./setup.py clean``.
+
+Building Options
+----------------
+
+If you've installed Eigen 3 to a directory different than ``/usr/include/eigen3``, edit
+``setup.cfg`` to set the correct path before building.
+
+Be default, Ceygen is built with ``-O2 -march=native`` C compiler switches, you'll need
+to edit ``setup.py`` currently to change them. Please note that it is important to enable
+optimizations and generation of appropriate MMX/SSE/altivec-enabled code as the actual
+computation code from Eigen is build along with the boilerplate Ceygen code.
 
 .. _Documentation:
 

@@ -16,8 +16,7 @@ from support.dist_cmd_test import test
 modules = create_extension_list(['ceygen/*.pyx', 'ceygen/tests/*.pyx'])
 for module in modules:
     module.language = "c++"
-    module.include_dirs.append('/usr/include/eigen3')
-    module.extra_compile_args.extend(['-O2', '-march=native', '-pipe'])
+    module.extra_compile_args.extend(['-O2', '-march=native'])
 
 setup(
     packages=['ceygen', 'ceygen.tests'],
