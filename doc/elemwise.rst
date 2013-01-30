@@ -18,7 +18,7 @@ This module implements some basic element-wise operations such as addition or di
    :type x: |vector|
    :param y: second addend
    :type y: |vector|
-   :param out: |out|
+   :param out: |out_elemwise|
    :type out: |vector|
    :raises: |valueerror|
    :raises: |typeerror|
@@ -32,7 +32,7 @@ This module implements some basic element-wise operations such as addition or di
    :type x: |vector|
    :param y: subtrahend
    :type y: |vector|
-   :param out: |out|
+   :param out: |out_elemwise|
    :type out: |vector|
    :raises: |valueerror|
    :raises: |typeerror|
@@ -46,7 +46,7 @@ This module implements some basic element-wise operations such as addition or di
    :type x: |matrix|
    :param y: second addend
    :type y: |matrix|
-   :param out: |out|
+   :param out: |out_elemwise|
    :type out: |matrix|
    :raises: |valueerror|
    :raises: |typeerror|
@@ -60,7 +60,7 @@ This module implements some basic element-wise operations such as addition or di
    :type x: |matrix|
    :param y: subtrahend
    :type y: |matrix|
-   :param out: |out|
+   :param out: |out_elemwise|
    :type out: |matrix|
    :raises: |valueerror|
    :raises: |typeerror|
