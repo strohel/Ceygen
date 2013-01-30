@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from support import CeygenTestCase
+from support import CeygenTestCase, ut
 cimport ceygen.lu as l
 
 
@@ -47,7 +47,18 @@ class TestLu(CeygenTestCase):
             self.assertApproxEqual(x, np.linalg.inv(x_copy))
 
     def test_iinv_badinput(self):
-        # l.iing(None) doesn't fail, sholdn't matter
+        # l.iing(None) doesn't fail, shouldn't matter
         for X in(np.array([1., 2.]), np.array([[1.], [2.]])):
             with self.assertRaises(ValueError):
                 l.iinv(X)
+
+    def test_det(self):
+        self.assertApproxEqual(l.det(np.array([[1., 2.], [3., 4.]])), -2.)
+        self.assertApproxEqual(l.det(np.array([[1., 2.], [2., 4.]])), 0.)
+        self.assertApproxEqual(l.det(np.array([[17.]])), 17.)
+
+    @ut.skip('Needs to be skipped until Eigen bug http://eigen.tuxfamily.org/bz/show_bug.cgi?id=548 is fixed')
+    def test_det_badinput(self):
+        for X in(np.array([1.]), np.array([[1., 2.]]), None):
+            with self.assertRaises(ValueError):
+                l.det(X)

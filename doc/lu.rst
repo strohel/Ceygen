@@ -33,6 +33,16 @@ provided by the <`Eigen/LU`_> include), most notably matrix inverse and determin
    :raises: |typeerror|
    :returns: |alwaystrue|
 
+.. function:: det(x)
+
+   Compute determinant of a square matrix *x* using LU decomposition.
+
+   :param x: matrix whose determimant to compute
+   :type x: |matrix|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |scalar|
+
 .. _`Eigen/LU`: http://eigen.tuxfamily.org/dox/QuickRefPage.html#QuickRef_Headers
 
 .. include:: definitions.rst

@@ -30,3 +30,10 @@ cdef bint iinv(dtype[:, :] x) nogil except False:
     # how comes this doesn't exhibit aliasing problems?
     x_map.assign_inverse(x_map)
     return True
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype det(dtype[:, :] x) nogil except *:
+    cdef MatrixMap[dtype] x_map
+    x_map.init(&x[0, 0], x.shape, x.strides)
+    return x_map.determinant()
