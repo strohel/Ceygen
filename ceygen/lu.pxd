@@ -3,8 +3,7 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
-"""Ceygen's tests"""
+from dtype cimport dtype
 
-from test_core import *
-from test_elemwise import *
-from test_lu import *
+
+cdef dtype[:, :] inv(dtype[:, :] x, dtype[:, :] out = *) nogil

@@ -8,6 +8,8 @@
 #define eigen_assert(statement) do { if(!(statement)) throw std::invalid_argument(#statement " does not hold (in Eigen)"); } while(0)
 
 #include <Eigen/Core>
+#include <Eigen/LU> // for Matrix.inverse()
+
 #include <Python.h>
 
 #ifdef DEBUG
@@ -71,6 +73,13 @@ class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Unaligne
 		template<typename T>
 		inline void noalias_assign(const T &rhs) {
 			this->noalias() = rhs;
+		}
+
+		// this is a HACK because if we write "x = y.inverse()" in a .pyx file, Cython
+		// creates a temporary, which breaks Matrix's operator= and needless copies memory
+		template<typename T>
+		inline void assign_inverse(const T &rhs) {
+			*this = rhs.inverse();
 		}
 
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(MatrixMap)

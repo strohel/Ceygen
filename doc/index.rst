@@ -8,6 +8,7 @@ Ceygen API Documentation
    README
    core
    elemwise
+   lu
 
 Indices and tables
 ==================

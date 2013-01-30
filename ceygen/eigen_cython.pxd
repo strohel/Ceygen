@@ -10,7 +10,7 @@ cdef extern from "eigen_cpp.h":
         # note: Cython doesn't like VectorMap[Scalar] anywhere except in cdef cppclass ...
         # declaration. Using just the class without template param everywhere else works
         # well
-        VectorMap transpose() nogil
+        VectorMap transpose() nogil  # should never raise an Exception
 
         Scalar dot(VectorMap) nogil except +
         VectorMap operator+(VectorMap) nogil except +
@@ -28,3 +28,4 @@ cdef extern from "eigen_cpp.h":
         VectorMap operator*(VectorMap) nogil except +
         MatrixMap operator*(MatrixMap) nogil except +
         void noalias_assign(MatrixMap) nogil except +
+        void assign_inverse(MatrixMap) nogil except +
