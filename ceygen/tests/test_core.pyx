@@ -3,12 +3,11 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
-"""Tests for core"""
-
 import numpy as np
 
 from support import CeygenTestCase
 cimport ceygen.core as c
+
 
 class TestCore(CeygenTestCase):
 
