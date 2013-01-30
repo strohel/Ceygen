@@ -21,6 +21,18 @@ provided by the <`Eigen/LU`_> include), most notably matrix inverse and determin
    :raises: |typeerror|
    :rtype: |matrix|
 
+.. function:: iinv(x[, out=None])
+
+   Compte matrix inverse using LU decomposition with partial pivoting in-place. Equivalent
+   to *x* = :obj:`inv(x) <inv>`, but without overhead. It is your responsibility to ensure
+   that *x* is invertible, otherwise you get undefined result without any warning.
+
+   :param x: matrix to invert in-place
+   :type x: |matrix|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :returns: |alwaystrue|
+
 .. _`Eigen/LU`: http://eigen.tuxfamily.org/dox/QuickRefPage.html#QuickRef_Headers
 
 .. include:: definitions.rst

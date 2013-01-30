@@ -16,6 +16,7 @@ cdef extern from "eigen_cpp.h":
         VectorMap operator+(VectorMap) nogil except +
         VectorMap operator-(VectorMap) nogil except +
         VectorMap operator*(MatrixMap) nogil except +
+
         void noalias_assign(VectorMap) nogil except +
 
     cdef cppclass MatrixMap[Scalar]:
@@ -27,5 +28,6 @@ cdef extern from "eigen_cpp.h":
         MatrixMap operator-(MatrixMap) nogil except +
         VectorMap operator*(VectorMap) nogil except +
         MatrixMap operator*(MatrixMap) nogil except +
+
         void noalias_assign(MatrixMap) nogil except +
         void assign_inverse(MatrixMap) nogil except +

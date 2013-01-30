@@ -23,6 +23,7 @@
    support buffer interface (e.g. a plain list). Use preferrably a `Cython memoryview`_
    and resort to :obj:`Python array <array>`, `Cython array`_ or a
    :obj:`NumPy array <numpy.ndarray>`.
+.. |alwaystrue| replace:: Always :obj:`True` to allow fast exception propagation.
 
 .. _`would give incorrect result without any error`: http://eigen.tuxfamily.org/dox/TopicAliasing.html
 .. _`for this element-wise operation`: http://eigen.tuxfamily.org/dox/TopicAliasing.html

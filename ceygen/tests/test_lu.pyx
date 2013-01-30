@@ -38,3 +38,16 @@ class TestLu(CeygenTestCase):
                 else:
                     with self.assertRaises(ValueError):
                         l.inv(X, OUT)  # this should be valid
+
+    def test_iinv(self):
+        for size in (1, 2, 3, 5, 9, 12, 15, 31):
+            x = np.random.rand(size, size)
+            x_copy = x.copy()
+            l.iinv(x)
+            self.assertApproxEqual(x, np.linalg.inv(x_copy))
+
+    def test_iinv_badinput(self):
+        # l.iing(None) doesn't fail, sholdn't matter
+        for X in(np.array([1., 2.]), np.array([[1.], [2.]])):
+            with self.assertRaises(ValueError):
+                l.iinv(X)

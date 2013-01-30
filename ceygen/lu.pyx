@@ -10,7 +10,6 @@ from eigen_cython cimport *
 from dtype cimport get_format
 
 
-
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef dtype[:, :] inv(dtype[:, :] x, dtype[:, :] out = None) nogil:
@@ -22,3 +21,12 @@ cdef dtype[:, :] inv(dtype[:, :] x, dtype[:, :] out = None) nogil:
     out_map.init(&out[0, 0], out.shape, out.strides)
     out_map.assign_inverse(x_map)
     return out
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef bint iinv(dtype[:, :] x) nogil except False:
+    cdef MatrixMap[dtype] x_map
+    x_map.init(&x[0, 0], x.shape, x.strides)
+    # how comes this doesn't exhibit aliasing problems?
+    x_map.assign_inverse(x_map)
+    return True

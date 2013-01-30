@@ -7,3 +7,4 @@ from dtype cimport dtype
 
 
 cdef dtype[:, :] inv(dtype[:, :] x, dtype[:, :] out = *) nogil
+cdef bint iinv(dtype[:, :] x) nogil except False
