@@ -28,29 +28,29 @@ Features
 
 Ceygen...
 
- * **is fast** - Ceygen's primary raison d'être is to provide overhead-free algebraic
-   operations for Cython projects that work with `typed memoryviews`_ (especially
-   small-sized). For every function there is a code-path where no Python function is
-   called, no memory is allocated on heap and no data is copied.
-   `Eigen itself performs rather well`_, too.
- * **is documented** - see `Documentation`_
- * **supports various data types** - Ceygen uses Cython `fused types`_ (a.k.a. wannabe
-   templates) along with Eigen's template nature to support various data types without
-   duplicating code. While just a few types are pre-defined (float, double, ...), adding
-   a new type is a matter of adding 3 lines and rebuilding Ceygen.
- * **is extensively tested** - Ceygen's test suite validates every public Cython method,
-   including errors raised on invalid input. Thanks to Travis CI, `every push is
-   automatically tested`_ against **Python 2.6**, **2.7**, **3.2** and **3.3**.
- * **is multithreading-friendly** - Every Ceygen function doesn't acquire the GIL_
-   unless it needs to create a Python object (always avoidable); all functions are
-   declared nogil_ so that you can call them in prange_ blocks without losing parallelism.
- * **provides descriptive error messages** - Care is taken to propagate all errors
-   properly (down from Eigen) so that you are not stuck debugging your program. Ceygen
-   functions don't crash on invalid input but rather raise reasonable errors.
- * works well with NumPy_, but doesn't depend on it. You don't need NumPy to build or run
-   Ceygen, but thanks to Cython, `Cython memoryviews and NumPy arrays`_ are fully
-   interchangeable without copying the data (where it is possible). The test suite
-   currently makes use of NumPy because of our laziness. :-)
+* **is fast** - Ceygen's primary raison d'être is to provide overhead-free algebraic
+  operations for Cython projects that work with `typed memoryviews`_ (especially
+  small-sized). For every function there is a code-path where no Python function is
+  called, no memory is allocated on heap and no data is copied.
+  `Eigen itself performs rather well`_, too.
+* **is documented** - see `Documentation`_
+* **supports various data types** - Ceygen uses Cython `fused types`_ (a.k.a. wannabe
+  templates) along with Eigen's template nature to support various data types without
+  duplicating code. While just a few types are pre-defined (float, double, ...), adding
+  a new type is a matter of adding 3 lines and rebuilding Ceygen.
+* **is extensively tested** - Ceygen's test suite validates every public Cython method,
+  including errors raised on invalid input. Thanks to Travis CI, `every push is
+  automatically tested`_ against **Python 2.6**, **2.7**, **3.2** and **3.3**.
+* **is multithreading-friendly** - Every Ceygen function doesn't acquire the GIL_
+  unless it needs to create a Python object (always avoidable); all functions are
+  declared nogil_ so that you can call them in prange_ blocks without losing parallelism.
+* **provides descriptive error messages** - Care is taken to propagate all errors
+  properly (down from Eigen) so that you are not stuck debugging your program. Ceygen
+  functions don't crash on invalid input but rather raise reasonable errors.
+* works well with NumPy_, but doesn't depend on it. You don't need NumPy to build or run
+  Ceygen, but thanks to Cython, `Cython memoryviews and NumPy arrays`_ are fully
+  interchangeable without copying the data (where it is possible). The test suite
+  currently makes use of NumPy because of our laziness. :-)
 
 .. _`Eigen itself performs rather well`: http://eigen.tuxfamily.org/index.php?title=Benchmark
 .. _`fused types`: http://docs.cython.org/src/userguide/fusedtypes.html
@@ -63,20 +63,20 @@ Ceygen...
 
 On the other hand, Ceygen...
 
- * **depends on Eigen build-time**. Ceygen expects *Eigen 3* headers to be installed under
-   ``/usr/lib/eigen3`` when it is being built. Installing Eigen is a matter of unpacking
-   it, because it is a pure template library defined solely in the headers. Ceygen doesn't
-   reference Eigen at all at runtime because all code is complited in.
- * **still provides a very little subset of Eigen functionality**. We add new functions
-   only as we need them in another projects, but we believe that the hard part is the
-   infrastructure - implementing a new function should be rather straightforward (with
-   decent Cython and C++ knowledge). We're very open to pull requests!
-   (do include unit tests in them)
- * **needs recent Cython** to compile. [#cythonvers]_ If this is a problem, you can
-   distribute .cpp files or final Python extension module instead.
- * **doesn't bring Eigen's elegance to Cython** - if you think of lazy evaluation and
-   advanced expessions, stop dreaming. Ceygen will make your code faster, not nicer.
-   `Array expessions`_ will help here.
+* **depends on Eigen build-time**. Ceygen expects *Eigen 3* headers to be installed under
+  ``/usr/lib/eigen3`` when it is being built. Installing Eigen is a matter of unpacking
+  it, because it is a pure template library defined solely in the headers. Ceygen doesn't
+  reference Eigen at all at runtime because all code is complited in.
+* **still provides a very little subset of Eigen functionality**. We add new functions
+  only as we need them in another projects, but we believe that the hard part is the
+  infrastructure - implementing a new function should be rather straightforward (with
+  decent Cython and C++ knowledge). We're very open to pull requests!
+  (do include unit tests in them)
+* **needs recent Cython** to compile. [#cythonvers]_ If this is a problem, you can
+  distribute .cpp files or final Python extension module instead.
+* **doesn't bring Eigen's elegance to Cython** - if you think of lazy evaluation and
+  advanced expessions, stop dreaming. Ceygen will make your code faster, not nicer.
+  `Array expessions`_ will help here.
 
 .. _`Array expessions`: https://github.com/cython/cython/pull/144
 
@@ -84,11 +84,12 @@ Building
 ========
 
 Ceygen uses standard Distutils to build, test and install itself, simply run:
- * ``python setup.py build`` to build Ceygen
- * ``python setup.py test`` to test it (inside build directory)
- * ``python setup.py install`` to install it
- * ``python setup.py clean`` to clean generated object, .cpp and .html files (perhaps to force
-   recompilation)
+
+* ``python setup.py build`` to build Ceygen
+* ``python setup.py test`` to test it (inside build directory)
+* ``python setup.py install`` to install it
+* ``python setup.py clean`` to clean generated object, .cpp and .html files (perhaps to
+  force recompilation)
 
 Commands can be combined, automatically call dependent commands and can take options,
 the recommended combo to safely install Ceygen is therefore ``python setup.py -v test install``.
