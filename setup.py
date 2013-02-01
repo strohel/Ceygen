@@ -8,21 +8,20 @@ from Cython.Build.Dependencies import create_extension_list
 
 from distutils.core import setup
 
-from support.dist_cmd_build import build
-from support.dist_cmd_clean import clean
-from support.dist_cmd_test import test
+from support.dist import CeygenDistribution
 
 
 modules = create_extension_list(['ceygen/*.pyx', 'ceygen/tests/*.pyx'])
 for module in modules:
     module.language = "c++"
-    module.extra_compile_args.extend(['-O2', '-march=native'])
 
 setup(
     packages=['ceygen', 'ceygen.tests'],
     package_data={'ceygen': ['*.pxd']},
-    cmdclass = {'build': build, 'clean': clean, 'test': test},
+    distclass=CeygenDistribution,
     ext_modules=modules,
+    include_dirs=['/usr/include/eigen3'],  # default overridable by setup.cfg
+    cflags=['-O2', '-march=native'],
 
     # meta-data; see http://docs.python.org/distutils/setupscript.html#additional-meta-data
     name='Ceygen',

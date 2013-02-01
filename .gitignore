@@ -2,3 +2,4 @@
 *.cpp
 *.pyc
 *.html
+/setup.cfg

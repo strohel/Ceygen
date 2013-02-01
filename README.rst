@@ -33,7 +33,7 @@ Ceygen...
    small-sized). For every function there is a code-path where no Python function is
    called, no memory is allocated on heap and no data is copied.
    `Eigen itself performs rather well`_, too.
- * **is documented** - see :ref:`Documentation`
+ * **is documented** - see `Documentation`_
  * **supports various data types** - Ceygen uses Cython `fused types`_ (a.k.a. wannabe
    templates) along with Eigen's template nature to support various data types without
    duplicating code. While just a few types are pre-defined (float, double, ...), adding
@@ -83,24 +83,39 @@ On the other hand, Ceygen...
 Building
 ========
 
-Ceygen uses standard Distutils to build, test and install itself, simply run
-``./setup.py build`` to build Ceygen, ``./setup.py test`` to test it (inside build
-directory) and ``./setup.py install`` to install it. If you want to clean generated
-object, .cpp and .html files (perhaps to force recompilation), simply run
-``./setup.py clean``.
+Ceygen uses standard Distutils to build, test and install itself, simply run:
+ * ``python setup.py build`` to build Ceygen
+ * ``python setup.py test`` to test it (inside build directory)
+ * ``python setup.py install`` to install it
+ * ``python setup.py clean`` to clean generated object, .cpp and .html files (perhaps to force
+   recompilation)
+
+Commands can be combined, automatically call dependent commands and can take options,
+the recommended combo to safely install Ceygen is therefore ``python setup.py -v test install``.
 
 Building Options
 ----------------
 
-If you've installed Eigen 3 to a directory different than ``/usr/include/eigen3``, edit
-``setup.cfg`` to set the correct path before building.
+You can set various build options as it is usual with distutils, see
+``python setup.py --help``. Notable is the `build_ext` command and its `--include-dirs`
+(standard) and `--cflags` (Ceygen extension) options:
 
-Be default, Ceygen is built with ``-O2 -march=native`` C compiler switches, you'll need
-to edit ``setup.py`` currently to change them. Please note that it is important to enable
-optimizations and generation of appropriate MMX/SSE/altivec-enabled code as the actual
-computation code from Eigen is build along with the boilerplate Ceygen code.
+--include-dirs
+   defaults to `/usr/include/eigen3` and must be specified if you've installed Eigen 3
+   to a non-standard directory,
 
-.. _Documentation:
+--cflags
+   defaults to `-O2 -march=native`. Please note that it is important to enable
+   optimizations and generation of appropriate MMX/SSE/altivec-enabled code as the actual
+   computation code from Eigen is built along with the boilerplate Ceygen code.
+
+The resulting command could look like ``python setup.py -v build_ext
+--include-dirs=/usr/local/include/eigen3 --cflags="-O3 -march=core2" build test``. The
+same could be achieved by putting the options to a `setup.cfg` file::
+
+   [build_ext]
+   include_dirs = /usr/local/include/eigen3
+   cflags = -O3 -march=core2
 
 Documentation
 =============
