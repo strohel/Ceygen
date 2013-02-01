@@ -109,8 +109,8 @@ You can set various build options as it is usual with distutils, see
    optimizations and generation of appropriate MMX/SSE/altivec-enabled code as the actual
    computation code from Eigen is built along with the boilerplate Ceygen code.
 
-The resulting command could look like ``python setup.py -v build_ext
---include-dirs=/usr/local/include/eigen3 --cflags="-O3 -march=core2" build test``. The
+The resulting command could look like ``python setup.py build -v build_ext
+--include-dirs=/usr/local/include/eigen3 --cflags="-O3 -march=core2" test``. The
 same could be achieved by putting the options to a `setup.cfg` file::
 
    [build_ext]
