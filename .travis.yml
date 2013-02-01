@@ -10,8 +10,7 @@ install:
   - sudo apt-get install -qq libeigen3-dev
   - pip install cython --use-mirrors
   # Python 3 environment on travis doesn't see python3-numpy package, install manually
-  # \\ true must be there otherwise Travis aborts build in case of 2.x Python
-  - test ${TRAVIS_PYTHON_VERSION%%.*} = 3 && pip install numpy --use-mirrors || true
+  - if test ${TRAVIS_PYTHON_VERSION%%.*} = 3; then pip install numpy --use-mirrors; fi
 
 script:
   - python setup.py -v test
