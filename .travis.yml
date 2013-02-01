@@ -9,7 +9,10 @@ python:
 install:
   - pip install cython --use-mirrors
   - sudo apt-get install -qq libeigen3-dev
-  - sudo apt-get install -qq python3-numpy
+  - sudo apt-get install python3-numpy
+  - python -c 'import sys.path; print(sys.path)'
+  - echo "${TRAVIS_PYTHON_VERSION}"
+  - [ "${TRAVIS_PYTHON_VERSION}" = 3* ] && echo "Using Python 3"
 
 script:
   - python setup.py -v test
