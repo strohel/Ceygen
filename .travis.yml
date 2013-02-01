@@ -12,7 +12,7 @@ install:
   - sudo apt-get install python3-numpy
   - python -c 'import sys.path; print(sys.path)'
   - echo "${TRAVIS_PYTHON_VERSION}"
-  - [ "${TRAVIS_PYTHON_VERSION}" = 3* ] && echo "Using Python 3"
+  - \[ "${TRAVIS_PYTHON_VERSION}" = 3* \] && echo "Using Python 3"
 
 script:
   - python setup.py -v test
