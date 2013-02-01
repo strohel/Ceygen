@@ -5,6 +5,6 @@
 
 """Ceygen's tests"""
 
-from test_core import *
-from test_elemwise import *
-from test_lu import *
+from ceygen.tests.test_core import *
+from ceygen.tests.test_elemwise import *
+from ceygen.tests.test_lu import *

@@ -27,9 +27,9 @@ setup(
     # meta-data; see http://docs.python.org/distutils/setupscript.html#additional-meta-data
     name='Ceygen',
     version="0.1",
-    author=u'Matěj Laitl',
+    author='Matěj Laitl',
     author_email='matej@laitl.cz',
-    maintainer=u'Matěj Laitl',
+    maintainer='Matěj Laitl',
     maintainer_email='matej@laitl.cz',
     url='https://github.com/strohel/Ceygen',
     description='Cython helper for linear algebra with typed memoryviews built atop of Eigen C++ library',
