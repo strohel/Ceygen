@@ -14,8 +14,9 @@ matrix:
 install:
   - sudo apt-get install -qq libeigen3-dev
   - pip install cython --use-mirrors
-  # Python 3 environment on travis doesn't see python3-numpy package, install manually
-  - if test ${TRAVIS_PYTHON_VERSION%%.*} = 3; then pip install numpy --use-mirrors; fi
 
 script:
+  # Python 3 environment on travis doesn't see python3-numpy package, install manually
+  # let's have this in script: so that it looks like Failure (and not Error) on travis
+  - if test ${TRAVIS_PYTHON_VERSION%%.*} = 3; then pip install numpy --use-mirrors; fi
   - python setup.py -v test
