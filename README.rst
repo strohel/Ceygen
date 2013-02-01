@@ -33,7 +33,7 @@ Ceygen...
   small-sized). For every function there is a code-path where no Python function is
   called, no memory is allocated on heap and no data is copied.
   `Eigen itself performs rather well`_, too.
-* **is documented** - see `Documentation`_
+* **is documented** - see `Documentation`_ or hop directly to `on-line docs`_.
 * **supports various data types** - Ceygen uses Cython `fused types`_ (a.k.a. wannabe
   templates) along with Eigen's template nature to support various data types without
   duplicating code. While just a few types are pre-defined (float, double, ...), adding
@@ -53,6 +53,7 @@ Ceygen...
   currently makes use of NumPy because of our laziness. :-)
 
 .. _`Eigen itself performs rather well`: http://eigen.tuxfamily.org/index.php?title=Benchmark
+.. _`on-line docs`: http://strohel.github.com/Ceygen-doc/
 .. _`fused types`: http://docs.cython.org/src/userguide/fusedtypes.html
 .. _`every push is automatically tested`: https://travis-ci.org/strohel/Ceygen
 .. _GIL: http://docs.python.org/glossary.html#term-global-interpreter-lock
@@ -126,7 +127,7 @@ and can be exported into a variety of formats using Sphinx_ (version at least 1.
 Just type ``make`` in that directory to see a list of supported formats and for example
 ``make html`` to build HTML pages with the documentation.
 
-On-line documentation is in the works.
+**On-line documentation** is available at http://strohel.github.com/Ceygen-doc/
 
 .. _reStructuredText: http://sphinx-doc.org/rest.html
 .. _Sphinx: http://sphinx-doc.org/
