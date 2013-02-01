@@ -39,7 +39,8 @@ Ceygen...
    duplicating code. While just a few types are pre-defined (float, double, ...), adding
    a new type is a matter of adding 3 lines and rebuilding Ceygen.
  * **is extensively tested** - Ceygen's test suite validates every public Cython method,
-   including errors raised on invalid input.
+   including errors raised on invalid input. Thanks to Travis CI, `every push is
+   automatically tested`_ against **Python 2.6**, **2.7**, **3.2** and **3.3**.
  * **is multithreading-friendly** - Every Ceygen function doesn't acquire the GIL_
    unless it needs to create a Python object (always avoidable); all functions are
    declared nogil_ so that you can call them in prange_ blocks without losing parallelism.
@@ -53,6 +54,7 @@ Ceygen...
 
 .. _`Eigen itself performs rather well`: http://eigen.tuxfamily.org/index.php?title=Benchmark
 .. _`fused types`: http://docs.cython.org/src/userguide/fusedtypes.html
+.. _`every push is automatically tested`: https://travis-ci.org/strohel/Ceygen
 .. _GIL: http://docs.python.org/glossary.html#term-global-interpreter-lock
 .. _nogil: http://docs.cython.org/src/userguide/external_C_code.html#declaring-a-function-as-callable-without-the-gil
 .. _prange: http://docs.cython.org/src/userguide/parallelism.html
@@ -72,6 +74,11 @@ On the other hand, Ceygen...
    (do include unit tests in them)
  * **needs recent Cython** to compile. [#cythonvers]_ If this is a problem, you can
    distribute .cpp files or final Python extension module instead.
+ * **doesn't bring Eigen's elegance to Cython** - if you think of lazy evaluation and
+   advanced expessions, stop dreaming. Ceygen will make your code faster, not nicer.
+   `Array expessions`_ will help here.
+
+.. _`Array expessions`: https://github.com/cython/cython/pull/144
 
 Building
 ========
@@ -110,4 +117,4 @@ On-line documentation is in the works.
 
 .. rubric:: Footnotes
 
-.. [#cythonvers] currently this is at least Cython 0.18 rc1.
+.. [#cythonvers] currently this is at least Cython 0.18.
