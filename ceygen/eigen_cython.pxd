@@ -13,6 +13,7 @@ cdef extern from "eigen_cpp.h":
         void init(Scalar *, const Py_ssize_t *, const Py_ssize_t *) nogil except +
 
         # our own methods:
+        void assign(BaseMap) nogil except +
         void assign_inverse(BaseMap) nogil except +
         void noalias_assign(BaseMap) nogil except +
 
@@ -31,5 +32,11 @@ cdef extern from "eigen_cpp.h":
     cdef cppclass VectorMap[Scalar](BaseMap):
         pass
 
+    cdef cppclass Array1DMap[Scalar](BaseMap):
+        pass
+
     cdef cppclass MatrixMap[Scalar](BaseMap):
+        pass
+
+    cdef cppclass Array2DMap[Scalar](BaseMap):
         pass

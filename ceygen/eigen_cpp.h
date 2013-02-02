@@ -47,16 +47,22 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 #			endif
 		};
 
+		// if we write "x = y" in a .pyx file, Cython creates a temporary, which breaks
+		// Matrix's operator= and needlessly copies memory
 		template<typename T>
-		inline void noalias_assign(const T &rhs) {
-			this->noalias() = rhs;
+		inline void assign(const T &rhs) {
+			*this = rhs;
 		}
 
-		// this is a HACK because if we write "x = y.inverse()" in a .pyx file, Cython
-		// creates a temporary, which breaks Matrix's operator= and needlessly copies memory
+		// see above
 		template<typename T>
 		inline void assign_inverse(const T &rhs) {
 			*this = rhs.inverse();
+		}
+
+		template<typename T>
+		inline void noalias_assign(const T &rhs) {
+			this->noalias() = rhs;
 		}
 
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(BaseMap)
@@ -68,6 +74,16 @@ class VectorMap : public BaseMap<Matrix<dtype, Dynamic, 1>, Stride<0, Dynamic> >
 };
 
 template<typename dtype>
+class Array1DMap : public BaseMap<Array<dtype, Dynamic, 1>, Stride<0, Dynamic> >
+{
+};
+
+template<typename dtype>
 class MatrixMap : public BaseMap<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Stride<Dynamic, Dynamic> >
+{
+};
+
+template<typename dtype>
+class Array2DMap : public BaseMap<Array<dtype, Dynamic, Dynamic, RowMajor>, Stride<Dynamic, Dynamic> >
 {
 };
