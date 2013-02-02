@@ -38,7 +38,7 @@ class TestElemwise(CeygenTestCase):
 
         for X in (x, np.array([1., 2.])):
             for OUT in (out, np.empty(1), np.empty(4)):
-                if X is x and (OUT is out or OUT is None):
+                if X is x and OUT is out:
                     e.add_vs(X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
@@ -76,7 +76,7 @@ class TestElemwise(CeygenTestCase):
 
         for X in (x, np.array([1., 2.])):
             for OUT in (out, np.empty(1), np.empty(4)):
-                if X is x and (OUT is out or OUT is None):
+                if X is x and OUT is out:
                     e.multiply_vs(X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
@@ -277,6 +277,84 @@ class TestElemwise(CeygenTestCase):
                     continue
                 with self.assertRaises(ValueError):
                     e.divide_vv(X, Y)
+
+
+    def test_add_ms(self):
+        x_np = np.array([[1., 3., 5.]])
+        y_np = -4.
+        expected = np.array([[-3., -1., 1.]])
+
+        self.assertApproxEqual(e.add_ms(x_np, y_np), expected)
+        self.assertApproxEqual(e.add_ms(x_np.T, y_np), expected.T)
+        out_np = np.empty((1, 3))
+        out2 = e.add_ms(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected)
+
+        cdef double[:, :] x = x_np
+        cdef double y = y_np
+        self.assertApproxEqual(e.add_ms(x, y), expected)
+        out_np[:, :] = -123.  # reset so that we would catch errors
+        cdef double[:, :] out = out_np
+        out2 = e.add_ms(x, y, out)
+        self.assertApproxEqual(out, expected)
+        self.assertApproxEqual(out2, expected)
+
+    def test_add_ms_baddims(self):
+        x = np.array([[1., 2., 3.]])
+        y = 3.
+        out = np.empty((1, 3))
+
+        for X in (x, np.array([[1., 2.]]), np.array([1., 2.])):
+            for OUT in (out, np.empty((1, 1)), np.empty((1, 4)), np.empty(3)):
+                if X is x and OUT is out:
+                    e.add_ms(X, y, OUT)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.add_ms(X, y, OUT)
+
+    def test_add_ms_none(self):
+        with self.assertRaises(ValueError):
+            e.add_ms(None, 3.)
+
+
+    def test_multiply_ms(self):
+        x_np = np.array([[1., 3., -5.]])
+        y_np = -4.
+        expected = np.array([[-4., -12., 20.]])
+
+        self.assertApproxEqual(e.multiply_ms(x_np, y_np), expected)
+        self.assertApproxEqual(e.multiply_ms(x_np.T, y_np), expected.T)
+        out_np = np.empty((1, 3))
+        out2 = e.multiply_ms(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected)
+
+        cdef double[:, :] x = x_np
+        cdef double y = y_np
+        self.assertApproxEqual(e.multiply_ms(x, y), expected)
+        out_np[:, :] = -123.  # reset so that we would catch errors
+        cdef double[:, :] out = out_np
+        out2 = e.multiply_ms(x, y, out)
+        self.assertApproxEqual(out, expected)
+        self.assertApproxEqual(out2, expected)
+
+    def test_multiply_ms_baddims(self):
+        x = np.array([[1., 2., 3.]])
+        y = 3.
+        out = np.empty((1, 3))
+
+        for X in (x, np.array([[1., 2.]]), np.array([1., 2.])):
+            for OUT in (out, np.empty((1, 1)), np.empty((1, 4)), np.empty(3)):
+                if X is x and OUT is out:
+                    e.multiply_ms(X, y, OUT)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.multiply_ms(X, y, OUT)
+
+    def test_multiply_ms_none(self):
+        with self.assertRaises(ValueError):
+            e.multiply_ms(None, 3.)
 
 
     def test_add_mm(self):

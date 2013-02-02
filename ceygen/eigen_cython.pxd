@@ -41,4 +41,6 @@ cdef extern from "eigen_cpp.h":
         pass
 
     cdef cppclass Array2DMap[Scalar](BaseMap):
-        pass
+        # http://trac.cython.org/cython_trac/ticket/800
+        BaseMap operator+(Scalar) nogil except +
+        BaseMap operator*(Scalar) nogil except +

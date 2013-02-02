@@ -12,7 +12,7 @@ This module implements some basic element-wise operations such as addition or di
 
 .. function:: add_vs(x, y[, out=None])
 
-   Vector-scalar addition: *x* + *y*
+   Add scalar *y* to each coefficient of vector *x* and return the resulting vector.
 
    Note: there's no **subtract_vs**, just add opposite number.
 
@@ -28,7 +28,7 @@ This module implements some basic element-wise operations such as addition or di
 
 .. function:: multiply_vs(x, y[, out=None])
 
-   Vector-scalar multiplication: *x* \* *y*
+   Multiply each coefficient of vector *x* by scalar *y* and return the resulting vector.
 
    Note: there's no **divide_vs**, just multiply by inverse number.
 
@@ -97,6 +97,38 @@ This module implements some basic element-wise operations such as addition or di
    :raises: |valueerror|
    :raises: |typeerror|
    :rtype: |vector|
+
+.. function:: add_ms(x, y[, out=None])
+
+   Add scalar *y* to each coefficient of matrix *x* and return the resulting matrix.
+
+   Note: there's no **subtract_ms**, just add opposite number.
+
+   :param x: first addend (matrix)
+   :type x: |matrix|
+   :param y: second addend (scalar)
+   :type y: |scalar|
+   :param out: |out_elemwise|
+   :type out: |matrix|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |matrix|
+
+.. function:: multiply_ms(x, y[, out=None])
+
+   Multiply each coefficient of matrix *x* by scalar *y* and return the resulting matrix.
+
+   Note: there's no **divide_ms**, just multiply by inverse number.
+
+   :param x: first addend (vector)
+   :type x: |matrix|
+   :param y: second addend (scalar)
+   :type y: |scalar|
+   :param out: |out_elemwise|
+   :type out: |matrix|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |matrix|
 
 .. function:: add_mm(x, y[, out=None])
 
