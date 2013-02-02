@@ -10,6 +10,38 @@ This module implements some basic element-wise operations such as addition or di
 
 .. module:: ceygen.elemwise
 
+.. function:: add_vs(x, y[, out=None])
+
+   Vector-scalar addition: *x* + *y*
+
+   Note: there's no **subtract_vs**, just add opposite number.
+
+   :param x: first addend (vector)
+   :type x: |vector|
+   :param y: second addend (scalar)
+   :type y: |scalar|
+   :param out: |out_elemwise|
+   :type out: |vector|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |vector|
+
+.. function:: multiply_vs(x, y[, out=None])
+
+   Vector-scalar multiplication: *x* \* *y*
+
+   Note: there's no **divide_vs**, just multiply by inverse number.
+
+   :param x: first addend (vector)
+   :type x: |vector|
+   :param y: second addend (scalar)
+   :type y: |scalar|
+   :param out: |out_elemwise|
+   :type out: |vector|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |vector|
+
 .. function:: add_vv(x, y[, out=None])
 
    Vector-vector addition: *x* + *y*

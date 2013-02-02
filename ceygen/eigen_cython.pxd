@@ -33,7 +33,9 @@ cdef extern from "eigen_cpp.h":
         pass
 
     cdef cppclass Array1DMap[Scalar](BaseMap):
-        pass
+        # must be here, Cython has problems inheriting overloads, http://trac.cython.org/cython_trac/ticket/800
+        BaseMap operator+(Scalar) nogil except +
+        BaseMap operator*(Scalar) nogil except +
 
     cdef cppclass MatrixMap[Scalar](BaseMap):
         pass

@@ -6,6 +6,9 @@
 from dtype cimport dtype
 
 
+cdef dtype[:] add_vs(dtype[:] x, dtype y, dtype[:] out = *) nogil
+cdef dtype[:] multiply_vs(dtype[:] x, dtype y, dtype[:] out = *) nogil
+
 cdef dtype[:] add_vv(dtype[:] x, dtype[:] y, dtype[:] out = *) nogil
 cdef dtype[:] subtract_vv(dtype[:] x, dtype[:] y, dtype[:] out = *) nogil
 cdef dtype[:] multiply_vv(dtype[:] x, dtype[:] y, dtype[:] out = *) nogil

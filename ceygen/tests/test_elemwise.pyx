@@ -11,6 +11,82 @@ cimport ceygen.elemwise as e
 
 class TestElemwise(CeygenTestCase):
 
+    def test_add_vs(self):
+        x_np = np.array([1., 3., 5.])
+        y_np = -4.
+        expected = np.array([-3., -1., 1.])
+
+        self.assertApproxEqual(e.add_vs(x_np, y_np), expected)
+        out_np = np.empty(3)
+        out2 = e.add_vs(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected)
+
+        cdef double[:] x = x_np
+        cdef double y = y_np
+        self.assertApproxEqual(e.add_vs(x, y), expected)
+        out_np[:] = -123.  # reset so that we would catch errors
+        cdef double[:] out = out_np
+        out2 = e.add_vs(x, y, out)
+        self.assertApproxEqual(out, expected)
+        self.assertApproxEqual(out2, expected)
+
+    def test_add_vs_baddims(self):
+        x = np.array([1., 2., 3.])
+        y = 3.
+        out = np.empty(3)
+
+        for X in (x, np.array([1., 2.])):
+            for OUT in (out, np.empty(1), np.empty(4)):
+                if X is x and (OUT is out or OUT is None):
+                    e.add_vs(X, y, OUT)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.add_vs(X, y, OUT)
+
+    def test_add_vs_none(self):
+        with self.assertRaises(ValueError):
+            e.add_vs(None, 3.)
+
+
+    def test_multiply_vs(self):
+        x_np = np.array([1., 3., -5.])
+        y_np = -4.
+        expected = np.array([-4., -12., 20.])
+
+        self.assertApproxEqual(e.multiply_vs(x_np, y_np), expected)
+        out_np = np.empty(3)
+        out2 = e.multiply_vs(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected)
+
+        cdef double[:] x = x_np
+        cdef double y = y_np
+        self.assertApproxEqual(e.multiply_vs(x, y), expected)
+        out_np[:] = -123.  # reset so that we would catch errors
+        cdef double[:] out = out_np
+        out2 = e.multiply_vs(x, y, out)
+        self.assertApproxEqual(out, expected)
+        self.assertApproxEqual(out2, expected)
+
+    def test_multiply_vs_baddims(self):
+        x = np.array([1., 2., 3.])
+        y = 3.
+        out = np.empty(3)
+
+        for X in (x, np.array([1., 2.])):
+            for OUT in (out, np.empty(1), np.empty(4)):
+                if X is x and (OUT is out or OUT is None):
+                    e.multiply_vs(X, y, OUT)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.multiply_vs(X, y, OUT)
+
+    def test_multiply_vs_none(self):
+        with self.assertRaises(ValueError):
+            e.multiply_vs(None, 3.)
+
+
     def test_add_vv(self):
         x_np = np.array([1., 3., 5.])
         y_np = np.array([3., 2., 1.])

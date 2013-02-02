@@ -12,6 +12,30 @@ from dtype cimport get_format
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+cdef dtype[:] add_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
+    cdef Array1DMap[dtype] x_map, out_map
+    if out is None:
+        with gil:
+            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0]))
+    x_map.init(&x[0], x.shape, x.strides)
+    out_map.init(&out[0], out.shape, out.strides)
+    out_map.assign(x_map + y)
+    return out
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype[:] multiply_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
+    cdef Array1DMap[dtype] x_map, out_map
+    if out is None:
+        with gil:
+            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0]))
+    x_map.init(&x[0], x.shape, x.strides)
+    out_map.init(&out[0], out.shape, out.strides)
+    out_map.assign(x_map * y)
+    return out
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef dtype[:] add_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef Array1DMap[dtype] x_map, y_map, out_map
     if out is None:

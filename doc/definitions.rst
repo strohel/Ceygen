@@ -15,8 +15,8 @@
    memory involves acquiring the GIL_ and calling many expensive Python functions). Once
    specified, it must must have correct dimensions to store the result of this operation
    (otherwise you get :obj:`~exceptions.ValueError`); the same *out* instance will be also
-   returned. *As an exception from the general rule*, you may repeat *x* (or *y*) here
-   `for this element-wise operation`_, but consider in-place variant instead.
+   returned. *As an exception from the general rule*, you **may repeat** *x* (or *y*) here
+   `for this element-wise operation`_.
 .. |valueerror| replace:: :obj:`~exceptions.ValueError` if argument dimensions aren't
    appropriate for this operation or if arguments are otherwise invalid.
 .. |typeerror| replace:: :obj:`~exceptions.TypeError` if you pass an argument that doesn't
