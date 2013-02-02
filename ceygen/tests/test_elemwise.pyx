@@ -27,7 +27,7 @@ class TestElemwise(CeygenTestCase):
         cdef double[:] y = y_np
         self.assertApproxEqual(e.add_vv(x, y), expected_xy)
         self.assertApproxEqual(e.add_vv(y, x), expected_yx)
-        out = out_np
+        cdef double[:] out = out_np
         out2 = e.add_vv(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
@@ -75,7 +75,7 @@ class TestElemwise(CeygenTestCase):
         cdef double[:] y = y_np
         self.assertApproxEqual(e.subtract_vv(x, y), expected_xy)
         self.assertApproxEqual(e.subtract_vv(y, x), expected_yx)
-        out = out_np
+        cdef double[:] out = out_np
         out2 = e.subtract_vv(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
@@ -123,7 +123,7 @@ class TestElemwise(CeygenTestCase):
         cdef double[:] y = y_np
         self.assertApproxEqual(e.multiply_vv(x, y), expected_xy)
         self.assertApproxEqual(e.multiply_vv(y, x), expected_yx)
-        out = out_np
+        cdef double[:] out = out_np
         out2 = e.multiply_vv(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
@@ -171,7 +171,7 @@ class TestElemwise(CeygenTestCase):
         cdef double[:] y = y_np
         self.assertApproxEqual(e.divide_vv(x, y), expected_xy)
         self.assertApproxEqual(e.divide_vv(y, x), expected_yx)
-        out = out_np
+        cdef double[:] out = out_np
         out2 = e.divide_vv(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
@@ -223,7 +223,7 @@ class TestElemwise(CeygenTestCase):
         self.assertApproxEqual(e.add_mm(y, x), expected_yx)
         self.assertApproxEqual(e.add_mm(x.T, y.T), expected_xy.T)
         self.assertApproxEqual(e.add_mm(y.T, x.T), expected_yx.T)
-        out = out_np
+        cdef double[:, :] out = out_np
         out2 = e.add_mm(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
@@ -275,7 +275,7 @@ class TestElemwise(CeygenTestCase):
         self.assertApproxEqual(e.subtract_mm(y, x), expected_yx)
         self.assertApproxEqual(e.subtract_mm(x.T, y.T), expected_xy.T)
         self.assertApproxEqual(e.subtract_mm(y.T, x.T), expected_yx.T)
-        out = out_np
+        cdef double[:, :] out = out_np
         out2 = e.subtract_mm(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
@@ -327,7 +327,7 @@ class TestElemwise(CeygenTestCase):
         self.assertApproxEqual(e.multiply_mm(y, x), expected_yx)
         self.assertApproxEqual(e.multiply_mm(x.T, y.T), expected_xy.T)
         self.assertApproxEqual(e.multiply_mm(y.T, x.T), expected_yx.T)
-        out = out_np
+        cdef double[:, :] out = out_np
         out2 = e.multiply_mm(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
@@ -379,7 +379,7 @@ class TestElemwise(CeygenTestCase):
         self.assertApproxEqual(e.divide_mm(y, x), expected_yx)
         self.assertApproxEqual(e.divide_mm(x.T, y.T), expected_xy.T)
         self.assertApproxEqual(e.divide_mm(y.T, x.T), expected_yx.T)
-        out = out_np
+        cdef double[:, :] out = out_np
         out2 = e.divide_mm(y, x, out)
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
