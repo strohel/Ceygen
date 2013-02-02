@@ -87,3 +87,29 @@ cdef dtype[:, :] subtract_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = Non
     out_map.init(&out[0, 0], out.shape, out.strides)
     out_map.assign(x_map - y_map)
     return out
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype[:, :] multiply_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
+    cdef Array2DMap[dtype] x_map, y_map, out_map
+    if out is None:
+        with gil:
+            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+    x_map.init(&x[0, 0], x.shape, x.strides)
+    y_map.init(&y[0, 0], y.shape, y.strides)
+    out_map.init(&out[0, 0], out.shape, out.strides)
+    out_map.assign(x_map * y_map)
+    return out
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype[:, :] divide_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
+    cdef Array2DMap[dtype] x_map, y_map, out_map
+    if out is None:
+        with gil:
+            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+    x_map.init(&x[0, 0], x.shape, x.strides)
+    y_map.init(&y[0, 0], y.shape, y.strides)
+    out_map.init(&out[0, 0], out.shape, out.strides)
+    out_map.assign(x_map / y_map)
+    return out

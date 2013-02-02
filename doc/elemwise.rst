@@ -94,6 +94,34 @@ This module implements some basic element-wise operations such as addition or di
    :raises: |typeerror|
    :rtype: |matrix|
 
+.. function:: multiply_mm(x, y[, out=None])
+
+   Matrix-matrix element-wise multiplication: *x* \* *y*
+
+   :param x: first factor
+   :type x: |matrix|
+   :param y: second factor
+   :type y: |matrix|
+   :param out: |out_elemwise|
+   :type out: |matrix|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |matrix|
+
+.. function:: divide_mm(x, y[, out=None])
+
+   Matrix-matrix element-wise division: *x* / *y*
+
+   :param x: numerator
+   :type x: |matrix|
+   :param y: denominator
+   :type y: |matrix|
+   :param out: |out_elemwise|
+   :type out: |matrix|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |matrix|
+
 .. _`array expressions`: https://github.com/markflorisson88/minivect/raw/master/thesis/thesis.pdf
 .. _`pull request`: https://github.com/cython/cython/pull/144
 
