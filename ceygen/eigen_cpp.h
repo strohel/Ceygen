@@ -22,50 +22,27 @@ using namespace Eigen;
  * Very simple Eigen::Map<> subclass that provides default constructor and lets
  * Cython late-initialize the map using init() method
  */
-template<typename dtype>
-class VectorMap : public Map<Matrix<dtype, Dynamic, 1>, Unaligned, Stride<0, Dynamic> >
+template<typename BaseType, typename StrideType>
+class BaseMap : public Map<BaseType, Unaligned, StrideType>
 {
 	public:
-		typedef Stride<0, Dynamic> StrideType;
-		typedef Map<Matrix<dtype, Dynamic, 1>, Unaligned, StrideType> Base;
+		typedef Map<BaseType, Unaligned, StrideType> Base;
+		typedef typename Base::Scalar Scalar;
 
-		VectorMap() : Base(0, 0, StrideType(0, 0)) {}
-		inline void init(dtype *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
+		BaseMap() : Base(0, 0, BaseType::ColsAtCompileTime == Dynamic ? 0 : BaseType::ColsAtCompileTime, StrideType(0, 0)) {}
+
+		inline void init(Scalar *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
 			// see http://eigen.tuxfamily.org/dox/TutorialMapClass.html
 			// this is NOT a heap allocation
-			// Cython has strides in bytes, Eigen in dtype-long units:
-			new (this) Base(data, shape[0], StrideType(0, strides[0]/sizeof(dtype)));
+			// Cython has strides in bytes, Eigen in Scalar-long units:
+			new (this) Base(data, shape[0],
+					BaseType::ColsAtCompileTime == Dynamic ? shape[1] : BaseType::ColsAtCompileTime,
+					StrideType(
+							StrideType::OuterStrideAtCompileTime == Dynamic ? strides[0]/sizeof(Scalar) : StrideType::OuterStrideAtCompileTime,
+							StrideType::OuterStrideAtCompileTime == Dynamic ? strides[1]/sizeof(Scalar) : strides[0]/sizeof(Scalar)));
 #			ifdef DEBUG
-				std::cerr << __PRETTY_FUNCTION__ << " shape=" << shape[0]
-				          << " strides=" << strides[0]/sizeof(dtype) << std::endl
-				          << *this << std::endl;
-#			endif
-		};
-
-		template<typename T>
-		inline void noalias_assign(const T &rhs) {
-			this->noalias() = rhs;
-		}
-
-		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(VectorMap)
-};
-
-/**
- * @see VectorMap
- */
-template<typename dtype>
-class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Unaligned, Stride<Dynamic, Dynamic> >
-{
-	public:
-		typedef Stride<Dynamic, Dynamic> StrideType;
-		typedef Map<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Unaligned, StrideType> Base;
-
-		MatrixMap() : Base(0, 0, 0, StrideType(0, 0)) {};
-		inline void init(dtype *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
-			new (this) Base(data, shape[0], shape[1], StrideType(strides[0]/sizeof(dtype), strides[1]/sizeof(dtype)));
-#			ifdef DEBUG
-				std::cerr << __PRETTY_FUNCTION__ << " shape=" << shape[0] << ", " << shape[1]
-				          << " strides=" << strides[0]/sizeof(dtype) << ", " << strides[1]/sizeof(dtype) << std::endl
+				std::cerr << __PRETTY_FUNCTION__ << " rows=" << this->rows() << ", cols=" << this->cols()
+				          << " outerStride=" << this->outerStride() << ", innerStride=" << this->innerStride() << std::endl
 				          << *this << std::endl;
 #			endif
 		};
@@ -76,11 +53,21 @@ class MatrixMap : public Map<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Unaligne
 		}
 
 		// this is a HACK because if we write "x = y.inverse()" in a .pyx file, Cython
-		// creates a temporary, which breaks Matrix's operator= and needless copies memory
+		// creates a temporary, which breaks Matrix's operator= and needlessly copies memory
 		template<typename T>
 		inline void assign_inverse(const T &rhs) {
 			*this = rhs.inverse();
 		}
 
-		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(MatrixMap)
+		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(BaseMap)
+};
+
+template<typename dtype>
+class VectorMap : public BaseMap<Matrix<dtype, Dynamic, 1>, Stride<0, Dynamic> >
+{
+};
+
+template<typename dtype>
+class MatrixMap : public BaseMap<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Stride<Dynamic, Dynamic> >
+{
 };
