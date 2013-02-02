@@ -80,7 +80,7 @@ class TestElemwise(CeygenTestCase):
         self.assertApproxEqual(out, expected_yx)
         self.assertApproxEqual(out2, expected_yx)
 
-    def test_subtract_vv_bsubtractims(self):
+    def test_subtract_vv_baddims(self):
         x = np.array([1., 2., 3.])
         y = np.array([3., 2., 1.])
         out = np.empty(3)
@@ -105,6 +105,102 @@ class TestElemwise(CeygenTestCase):
                     continue
                 with self.assertRaises(ValueError):
                     e.subtract_vv(X, Y)
+
+
+    def test_multiply_vv(self):
+        x_np = np.array([1., 2., 3.])
+        y_np = np.array([3., 2., 1.])
+        expected_xy, expected_yx = np.array([3., 4., 3.]), np.array([3., 4., 3.])
+
+        self.assertApproxEqual(e.multiply_vv(x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.multiply_vv(y_np, x_np), expected_yx)
+        out_np = np.empty(3)
+        out2 = e.multiply_vv(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected_xy)
+
+        cdef double[:] x = x_np
+        cdef double[:] y = y_np
+        self.assertApproxEqual(e.multiply_vv(x, y), expected_xy)
+        self.assertApproxEqual(e.multiply_vv(y, x), expected_yx)
+        out = out_np
+        out2 = e.multiply_vv(y, x, out)
+        self.assertApproxEqual(out, expected_yx)
+        self.assertApproxEqual(out2, expected_yx)
+
+    def test_multiply_vv_baddims(self):
+        x = np.array([1., 2., 3.])
+        y = np.array([3., 2., 1.])
+        out = np.empty(3)
+
+        for X in (x, np.array([1., 2.])):
+            for Y in (y, np.array([1., 2., 3., 4.])):
+                for OUT in (out, np.empty(2), np.empty(4)):
+                    if X is x and Y is y and OUT is out:
+                        e.multiply_vv(X, Y, OUT)  # this should be valid
+                        continue
+                    with self.assertRaises(ValueError):
+                        e.multiply_vv(X, Y, OUT)
+
+    def test_multiply_vv_none(self):
+        x = np.array([1., 2., 3.])
+        y = np.array([3., 2., 1.])
+
+        for X in (x, None):
+            for Y in (y, None):
+                if X is x and Y is y:
+                    e.multiply_vv(X, Y)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.multiply_vv(X, Y)
+
+
+    def test_divide_vv(self):
+        x_np = np.array([1., 2., 3.])
+        y_np = np.array([3., 2., 1.])
+        expected_xy, expected_yx = np.array([1./3., 1., 3.]), np.array([3., 1., 1./3.])
+
+        self.assertApproxEqual(e.divide_vv(x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.divide_vv(y_np, x_np), expected_yx)
+        out_np = np.empty(3)
+        out2 = e.divide_vv(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected_xy)
+
+        cdef double[:] x = x_np
+        cdef double[:] y = y_np
+        self.assertApproxEqual(e.divide_vv(x, y), expected_xy)
+        self.assertApproxEqual(e.divide_vv(y, x), expected_yx)
+        out = out_np
+        out2 = e.divide_vv(y, x, out)
+        self.assertApproxEqual(out, expected_yx)
+        self.assertApproxEqual(out2, expected_yx)
+
+    def test_divide_vv_baddims(self):
+        x = np.array([1., 2., 3.])
+        y = np.array([3., 2., 1.])
+        out = np.empty(3)
+
+        for X in (x, np.array([1., 2.])):
+            for Y in (y, np.array([1., 2., 3., 4.])):
+                for OUT in (out, np.empty(2), np.empty(4)):
+                    if X is x and Y is y and OUT is out:
+                        e.divide_vv(X, Y, OUT)  # this should be valid
+                        continue
+                    with self.assertRaises(ValueError):
+                        e.divide_vv(X, Y, OUT)
+
+    def test_divide_vv_none(self):
+        x = np.array([1., 2., 3.])
+        y = np.array([3., 2., 1.])
+
+        for X in (x, None):
+            for Y in (y, None):
+                if X is x and Y is y:
+                    e.divide_vv(X, Y)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.divide_vv(X, Y)
 
 
     def test_add_mm(self):

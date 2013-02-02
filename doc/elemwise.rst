@@ -38,6 +38,34 @@ This module implements some basic element-wise operations such as addition or di
    :raises: |typeerror|
    :rtype: |vector|
 
+.. function:: multiply_vv(x, y[, out=None])
+
+   Vector-vector element-wise multiplication: *x* \* *y*
+
+   :param x: first factor
+   :type x: |vector|
+   :param y: second factor
+   :type y: |vector|
+   :param out: |out_elemwise|
+   :type out: |vector|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |vector|
+
+.. function:: divide_vv(x, y[, out=None])
+
+   Vector-vector element-wise division: *x* / *y*
+
+   :param x: numerator
+   :type x: |vector|
+   :param y: denominator
+   :type y: |vector|
+   :param out: |out_elemwise|
+   :type out: |vector|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |vector|
+
 .. function:: add_mm(x, y[, out=None])
 
    Matrix-matrix addition: *x* + *y*
