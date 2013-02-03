@@ -1,0 +1,5 @@
+recursive-include ceygen *.h
+recursive-include doc *.py *.rst *.bat Makefile
+recursive-include support *.py
+include *.rst
+exclude setup.cfg
