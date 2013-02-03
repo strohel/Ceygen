@@ -4,6 +4,13 @@ Element-wise Operations
 
 This module implements some basic element-wise operations such as addition or division.
 
+Because aliasing is not a problem for element-wise operations, you can make the operations
+in-place simply by repeating *x* or *y* in *out*. Following examples are therefore valid
+and produce expected results::
+
+   ceygen.elemwise.add_mm(x, y, x)
+   ceygen.elemwise.multiply_vv(a, b, b)
+
 .. note:: This module exists only as a stop-gap until support for element-wise operations
    with memoryviews is implemented in Cython. It will be phased out once Cython with Mark
    Florisson's `array expressions`_ `pull request`_ merged is released.
