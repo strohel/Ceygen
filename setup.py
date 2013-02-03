@@ -21,7 +21,7 @@ setup(
     distclass=CeygenDistribution,
     ext_modules=modules,
     include_dirs=['/usr/include/eigen3'],  # default overridable by setup.cfg
-    cflags=['-O2', '-march=native'],
+    cflags=['-O2', '-march=native'],  # ditto
 
     # meta-data; see http://docs.python.org/distutils/setupscript.html#additional-meta-data
     name='Ceygen',
@@ -31,12 +31,11 @@ setup(
     maintainer='Matěj Laitl',
     maintainer_email='matej@laitl.cz',
     url='https://github.com/strohel/Ceygen',
-    description='Cython helper for linear algebra with typed memoryviews built atop of Eigen C++ library',
-    long_description='Ceygen is a binary Python extension module helper for linear ' +
-        'algebra with Cython typed memoryviews. Cython is built atop of Eigen C++ ' +
-        'library. Ceygen is not a Cython wrapper or an interface to Eigen!',
-    # Note to myself: must manually upload on each release!
-    #download_url='https://github.com/downloads/strohel/Ceygen/Ceygen-'+version+'.tar.gz',
+    description='Cython helper for linear algebra with typed memoryviews built atop the Eigen C++ library',
+    long_description='Ceygen is a binary Python extension module for linear algebra ' +
+        'with Cython typed memoryviews. Ceygen is built atop the Eigen C++ library. ' +
+        'Ceygen is not a Cython wrapper or an interface to Eigen!',
+    download_url='http://pypi.python.org/pypi/Ceygen',
     platforms='cross-platform',
     license='GNU GPL v2+',
     classifiers=[

@@ -5,23 +5,24 @@ Ceygen
 About
 =====
 
-Ceygen is a binary Python extension module helper for linear algebra with Cython_
-`typed memoryviews`_. Cython is built atop of `Eigen C++ library`_. Ceygen is **not**
-a Cython wrapper or an interface to Eigen!
+Ceygen is a binary Python extension module for linear algebra with Cython_ `typed
+memoryviews`_. Ceygen is built atop the `Eigen C++ library`_. Ceygen is **not** a Cython
+wrapper or an interface to Eigen!
 
 The name Ceygen is a rather poor wordplay on Cython + Eigen; it has nothing to do
-with software piracy.
+with software piracy. Ceygen is currently distributed under GNU GPL v2+ license. The
+authors of Ceygen are however open to other licensing suggestions. (Do you want to use
+Ceygen in e.g. a BSD-licensed project? Ask!)
+
+Cython is being developed by Matěj Laitl with support from the `Institute of Information
+Theory and Automation, Academy of Sciences of the Czech Republic`_. Feel free to send me
+a mail to matej at laitl dot cz.
 
 .. _Cython: http://cython.org/
 .. _`typed memoryviews`: http://docs.cython.org/src/userguide/memoryviews.html
 .. _`Eigen C++ library`: http://eigen.tuxfamily.org/
-
-Licensing
----------
-
-Ceygen is currently distributed under GNU GPL v2+ license. The authors of
-Ceygen are however open to other licensing suggestions. (Do you want to use
-Ceygen in e.g. a BSD-licensed project? Ask!)
+.. _`Institute of Information Theory and Automation, Academy of Sciences of the Czech Republic`:
+   http://www.utia.cas.cz/
 
 Features
 ========
@@ -38,7 +39,7 @@ Ceygen...
   templates) along with Eigen's template nature to support various data types without
   duplicating code. While just a few types are pre-defined (float, double, ...), adding
   a new type is a matter of adding 3 lines and rebuilding Ceygen.
-* **is extensively tested** - Ceygen's test suite validates every public Cython method,
+* **is extensively tested** - Ceygen's test suite validates every its public method,
   including errors raised on invalid input. Thanks to Travis CI, `every push is
   automatically tested`_ against **Python 2.6**, **2.7**, **3.2** and **3.3**.
 * **is multithreading-friendly** - Every Ceygen function doesn't acquire the GIL_
@@ -92,10 +93,22 @@ A simple example to compute matrix product within a big matrix may look like
 [[ 1.  2.   2.  0.   2. -4.]
  [ 3.  4.   0. -2.   6. -8.]],
 
-where the `dot_mm`_ call above doesn't copy any data, allocates no temporaries or memory
-on heap and doesn't need the GIL_.
+where the `dot_mm`_ call above doesn't copy any data, allocates no memory on heap, doesn't
+need the GIL_ and uses vectorization (SSE, AltiVec...) to get the best out of your
+processor.
 
 .. _`dot_mm`: http://strohel.github.com/Ceygen-doc/core.html#ceygen.core.dot_mm
+
+Obtaining
+=========
+
+Ceygen development happens in `its github repository`_, ``git clone
+git@github.com:strohel/Ceygen.git`` -ing is the preferred way to get it as you'll have
+the latest & greatest version (which shouldn't break thanks to continuous integration).
+Released versions are available from `Ceygen's PyPI page`_.
+
+.. _`its github repository`: https://github.com/strohel/Ceygen
+.. _`Ceygen's PyPI page`: http://pypi.python.org/pypi/Ceygen
 
 Building
 ========
@@ -147,6 +160,14 @@ Just type ``make`` in that directory to see a list of supported formats and for 
 
 .. _reStructuredText: http://sphinx-doc.org/rest.html
 .. _Sphinx: http://sphinx-doc.org/
+
+Bugs
+====
+
+Please report any bugs you find and suggestions you may have to `Ceygen's github Issue
+Tracker`_.
+
+.. _`Ceygen's github Issue Tracker`: https://github.com/strohel/Ceygen/issues
 
 .. rubric:: Footnotes
 
