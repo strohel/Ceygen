@@ -81,6 +81,22 @@ On the other hand, Ceygen...
 
 .. _`Array expessions`: https://github.com/cython/cython/pull/144
 
+A simple example to compute matrix product within a big matrix may look like
+
+>>> cdef double[:, :] big = np.array([[1.,  2.,   2.,  0.,   0.,  0.],
+>>>                                   [3.,  4.,   0., -2.,   0.,  0.]])
+>>> ceygen.core.dot_mm(big[:, 0:2], big[:, 2:4], big[:, 4:6])
+[[ 2. -4.]
+ [ 6. -8.]]
+>>> big
+[[ 1.  2.   2.  0.   2. -4.]
+ [ 3.  4.   0. -2.   6. -8.]],
+
+where the `dot_mm`_ call above doesn't copy any data, allocates no temporaries or memory
+on heap and doesn't need the GIL_.
+
+.. _`dot_mm`: http://strohel.github.com/Ceygen-doc/core.html#ceygen.core.dot_mm
+
 Building
 ========
 

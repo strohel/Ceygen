@@ -11,6 +11,15 @@ cimport ceygen.core as c
 
 class TestCore(CeygenTestCase):
 
+    def test_from_readme(self):
+        cdef double[:, :] big = np.array([[1., 2., 2.,  0., 0., 0.],
+                                          [3., 4., 0., -2., 0., 0.]])
+        self.assertApproxEqual(c.dot_mm(big[:, 0:2], big[:, 2:4], big[:, 4:6]), [[2., -4.], [6., -8.]])
+        self.assertApproxEqual(big, [[1., 2., 2.,  0., 2., -4.],
+                                     [3., 4., 0., -2., 6., -8.]])
+        # TODO: the following like makes Python crash - bug in cython?
+        #self.assertApproxEqual(c.dot_mm(big[:, 0:2].T, big[:, 2:4], big[:, 4:6]), [[2., -6.], [4., -8.]])
+
     def test_dot_vv(self):
         x_np = np.array([1., 2., 3.])
         y_np = np.array([4., 5., 6.])
