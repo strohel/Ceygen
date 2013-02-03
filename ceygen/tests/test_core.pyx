@@ -189,6 +189,7 @@ class TestCore(CeygenTestCase):
                     else:
                         self.fail("ValueError was not raised (X={0}, Y={1}, out={2}".format(X, Y, out))
 
+
     def test_dot_mm(self):
         x_np = np.array([[1., 2.],
                          [3., 4.]])
