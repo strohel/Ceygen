@@ -1,5 +1,5 @@
 =======================
-Element-wise operations
+Element-wise Operations
 =======================
 
 This module implements some basic element-wise operations such as addition or division.
@@ -9,6 +9,9 @@ This module implements some basic element-wise operations such as addition or di
    Florisson's `array expressions`_ `pull request`_ merged is released.
 
 .. module:: ceygen.elemwise
+
+Vector-scalar Operations
+========================
 
 .. function:: add_vs(x, y[, out=None])
 
@@ -41,6 +44,9 @@ This module implements some basic element-wise operations such as addition or di
    :raises: |valueerror|
    :raises: |typeerror|
    :rtype: |vector|
+
+Vector-vector Operations
+========================
 
 .. function:: add_vv(x, y[, out=None])
 
@@ -98,6 +104,9 @@ This module implements some basic element-wise operations such as addition or di
    :raises: |typeerror|
    :rtype: |vector|
 
+Matrix-scalar Operations
+========================
+
 .. function:: add_ms(x, y[, out=None])
 
    Add scalar *y* to each coefficient of matrix *x* and return the resulting matrix.
@@ -129,6 +138,9 @@ This module implements some basic element-wise operations such as addition or di
    :raises: |valueerror|
    :raises: |typeerror|
    :rtype: |matrix|
+
+Matrix-matrix Operations
+========================
 
 .. function:: add_mm(x, y[, out=None])
 

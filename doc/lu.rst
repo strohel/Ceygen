@@ -1,5 +1,5 @@
 ==================================
-LU decomposition-powered functions
+LU Decomposition-powered Functions
 ==================================
 
 This module contains algebraic functions powered by the LU matrix decomposition (as
