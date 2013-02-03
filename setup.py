@@ -15,6 +15,9 @@ modules = create_extension_list(['ceygen/*.pyx', 'ceygen/tests/*.pyx'])
 for module in modules:
     module.language = "c++"
 
+with open('README') as file:
+    long_description = file.read()
+
 setup(
     packages=['ceygen', 'ceygen.tests'],
     package_data={'ceygen': ['*.pxd']},
@@ -32,9 +35,7 @@ setup(
     maintainer_email='matej@laitl.cz',
     url='https://github.com/strohel/Ceygen',
     description='Cython helper for linear algebra with typed memoryviews built atop the Eigen C++ library',
-    long_description='Ceygen is a binary Python extension module for linear algebra ' +
-        'with Cython typed memoryviews. Ceygen is built atop the Eigen C++ library. ' +
-        'Ceygen is not a Cython wrapper or an interface to Eigen!',
+    long_description=long_description,
     download_url='http://pypi.python.org/pypi/Ceygen',
     platforms='cross-platform',
     license='GNU GPL v2+',
