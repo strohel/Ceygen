@@ -2,10 +2,15 @@
  * Distributed under the terms of the GNU General Public License v2 or any
  * later version of the license, at your option. */
 
+// two macros ensures any macro passed will be expanded before being stringified
+#define STRINGIZE_DETAIL(x) #x
+#define STRINGIZE(x) STRINGIZE_DETAIL(x)
+
 #include <stdexcept>
 // make Eigen raise an exception instead of aborting on assert failure. Cython converts
 // std::runtime_error to Python RuntimeError
-#define eigen_assert(statement) do { if(!(statement)) throw std::invalid_argument(#statement " does not hold (in Eigen)"); } while(0)
+#define eigen_assert(statement) do { if(!(statement)) throw std::invalid_argument(#statement " does not hold in " __FILE__ ":" STRINGIZE(__LINE__)); } while(0)
+#define EIGEN_NO_AUTOMATIC_RESIZING // affects operator=, Ceygen doesn't want resizing
 
 #include <Eigen/Core>
 #include <Eigen/LU> // for Matrix.inverse()
