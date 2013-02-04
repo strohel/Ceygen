@@ -8,9 +8,10 @@
 import numpy as np
 
 import functools
+import os
 import unittest as ut
 try:
-    from unittest import skip
+    from unittest import skip, skipIf, skipUnless
 except ImportError:
     skip = None
 
@@ -76,6 +77,27 @@ if skip is None:
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
                 pass
+            origdoc = wrapper.__doc__ or wrapper.__name__
             wrapper.__doc__ = wrapper.__name__ + " [skipped '{0}']".format(reason)
             return wrapper
         return decorator
+
+    def _id(obj):
+        return obj
+
+    def skipIf(condition, reason):
+        """Implementation of the @skipIf decorator from Python 2.7 for Python 2.6"""
+        if condition:
+            return skip(reason)
+        return _id
+
+    def skipUnless(condition, reason):
+        """Implementation of the @skipUnless decorator from Python 2.7 for Python 2.6"""
+        if not condition:
+            return skip(reason)
+        return _id
+
+def benchmark(func):
+    """Decorator to mark functions as benchmarks so that they aren't run by default"""
+    reason = 'because BENCHMARK environment variable is not set'
+    return skipUnless('BENCHMARK' in os.environ, reason)(func)

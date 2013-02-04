@@ -8,13 +8,14 @@ np_dot = np.dot
 
 from time import time
 
-from support import CeygenTestCase
+from support import CeygenTestCase, benchmark
 cimport ceygen.core as c
 
 
 class Bench(CeygenTestCase):
 
-    def test_dot(self):
+    @benchmark
+    def test_bench_dot_mm(self):
         print
         cdef int iterations
         cdef double[:, :] x
@@ -29,21 +30,21 @@ class Bench(CeygenTestCase):
             y = y_np
             out = out_np
 
-            cost = size**3.
-            iterations = min(3.*10.**9. / cost, 1000000)
+            cost = 2. * size**3.
+            iterations = min(2. * 10.**9. / cost, 1000000)
             print "size: {0}x{0}, iterations: {1}".format(size, iterations)
 
             elapsed = time()
             for i in range(iterations):
                 np_dot(x_np, y_np, out_np)
             elapsed = time() - elapsed
-            print "       numpy: {0}s per call, {1}s total".format(elapsed/iterations, elapsed)
+            print "   numpy: {0:.2e}s per call, {1:.3f}s total, {2:5.2f} GFLOPS".format(elapsed/iterations, elapsed, cost*iterations/elapsed/10.**9)
             out_copy = out.copy()
 
             elapsed = time()
             for i in range(iterations):
                 c.dot_mm(x, y, out)
             elapsed = time() - elapsed
-            print "      ceygen: {0}s per call, {1}s total".format(elapsed/iterations, elapsed)
+            print "   numpy: {0:.2e}s per call, {1:.3f}s total, {2:5.2f} GFLOPS".format(elapsed/iterations, elapsed, cost*iterations/elapsed/10.**9)
 
             self.assertApproxEqual(out, out_copy)
