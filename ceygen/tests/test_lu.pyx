@@ -57,7 +57,7 @@ class TestLu(CeygenTestCase):
         self.assertApproxEqual(l.det(np.array([[1., 2.], [2., 4.]])), 0.)
         self.assertApproxEqual(l.det(np.array([[17.]])), 17.)
 
-    @skip('until Eigen bug http://eigen.tuxfamily.org/bz/show_bug.cgi?id=548 is fixed')
+    @skip('until fix from http://eigen.tuxfamily.org/bz/show_bug.cgi?id=548 is released in Eigen')
     def test_det_badinput(self):
         for X in(np.array([1.]), np.array([[1., 2.]]), None):
             with self.assertRaises(ValueError):
