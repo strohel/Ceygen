@@ -23,6 +23,13 @@
 
 using namespace Eigen;
 
+// for noalias_assign_dot_mm():
+enum Contiguity {
+	NoContig,
+	CConting,
+	FContig
+};
+
 /**
  * Very simple Eigen::Map<> subclass that provides default constructor and lets
  * Cython late-initialize the map using init() method
@@ -80,6 +87,7 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 
 		/** Very special optimization for dot_mm: TODO
 		 */
+		template<Contiguity XContiguity, Contiguity YContiguity>
 		inline void noalias_assign_dot_mm(
 				Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
 				Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides)
