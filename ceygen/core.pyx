@@ -56,5 +56,23 @@ cdef dtype[:, :] dot_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) no
         with gil:
             out = view.array(shape=(x.shape[0],y.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
     out_map.init(&out[0, 0], out.shape, out.strides)
-    out_map.noalias_assign_dot_mm(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
+
+    # ternary decision tree; this needs to be fast, sorry about it
+    # note: there are no contig-noncontig variants as both arguments need to be contig for any positive effect
+    if x.strides[1] == sizeof(dtype):
+        if y.strides[1] == sizeof(dtype):
+            out_map.noalias_assign_dot_cc(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
+        elif y.strides[0] == sizeof(dtype):
+            out_map.noalias_assign_dot_cf(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
+        else:
+            out_map.noalias_assign_dot_mm(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
+    elif x.strides[0] == sizeof(dtype):
+        if y.strides[1] == sizeof(dtype):
+            out_map.noalias_assign_dot_fc(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
+        elif y.strides[0] == sizeof(dtype):
+            out_map.noalias_assign_dot_ff(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
+        else:
+            out_map.noalias_assign_dot_mm(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
+    else:
+        out_map.noalias_assign_dot_mm(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides)
     return out

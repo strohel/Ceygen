@@ -18,7 +18,20 @@ cdef extern from "eigen_cpp.h":
         void noalias_assign(BaseMap) nogil except +
         void noalias_assign_dot_mm "noalias_assign_dot_mm<NoContig, NoContig>"(
             Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
-            Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides)nogil except +
+            Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides) nogil except +
+        # following are different template specializations, Ceygen unfortunately doesn't support yet function templates
+        void noalias_assign_dot_cc "noalias_assign_dot_mm<CContig, CContig>"(
+            Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
+            Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides) nogil except +
+        void noalias_assign_dot_cf "noalias_assign_dot_mm<CContig, FContig>"(
+            Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
+            Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides) nogil except +
+        void noalias_assign_dot_fc "noalias_assign_dot_mm<FContig, CContig>"(
+            Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
+            Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides) nogil except +
+        void noalias_assign_dot_ff "noalias_assign_dot_mm<FContig, FContig>"(
+            Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
+            Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides) nogil except +
 
         # exported Eigen methods
         Scalar determinant() nogil except +

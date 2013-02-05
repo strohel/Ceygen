@@ -26,7 +26,7 @@ using namespace Eigen;
 // for noalias_assign_dot_mm():
 enum Contiguity {
 	NoContig,
-	CConting,
+	CContig,
 	FContig
 };
 
@@ -85,17 +85,39 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 			this->noalias() = rhs;
 		}
 
-		/** Very special optimization for dot_mm: TODO
-		 */
+		/* Very special optimization for dot_mm: Eigen resorts to allocating new memory
+		 * and copying the data if the arrays in matrix product don't have compile
+		 * time-fixed innerStride. Make it fixed in cases of contiguous arrays. */
 		template<Contiguity XContiguity, Contiguity YContiguity>
 		inline void noalias_assign_dot_mm(
 				Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
 				Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides)
 		{
-			typedef Stride<Dynamic, Dynamic> MyStride;
-			typedef Map<Matrix<Scalar, Dynamic, Dynamic, RowMajor>, Unaligned, MyStride> MyMatrix;
-			MyMatrix x(x_data, x_shape[0], x_shape[1], MyStride(x_strides[0]/sizeof(Scalar), x_strides[1]/sizeof(Scalar)));
-			MyMatrix y(y_data, y_shape[0], y_shape[1], MyStride(y_strides[0]/sizeof(Scalar), y_strides[1]/sizeof(Scalar)));
+			enum {
+				CompileTimeXInnerstride = (XContiguity == NoContig) ? Dynamic : 1,
+				CompileTimeYInnerstride = (YContiguity == NoContig) ? Dynamic : 1,
+				XLayout = (XContiguity == FContig) ? ColMajor : RowMajor, // NoContig defaults to RowMajor
+				YLayout = (YContiguity == FContig) ? ColMajor : RowMajor, // NoContig defaults to RowMajor
+				// following justs swaps inner/outer stride indices for F-contiguos matrices:
+				XOuterStrideIndex = (XContiguity == FContig) ? 1 : 0,
+				YOuterStrideIndex = (YContiguity == FContig) ? 1 : 0,
+				XInnerStrideIndex = (XContiguity == FContig) ? 0 : 1,
+				YInnerStrideIndex = (YContiguity == FContig) ? 0 : 1,
+			};
+			typedef Stride<Dynamic, CompileTimeXInnerstride> XStride;
+			typedef Stride<Dynamic, CompileTimeYInnerstride> YStride;
+			typedef Map<Matrix<Scalar, Dynamic, Dynamic, XLayout>, Unaligned, XStride> XMatrix;
+			typedef Map<Matrix<Scalar, Dynamic, Dynamic, YLayout>, Unaligned, YStride> YMatrix;
+#			ifdef DEBUG
+				std::cerr << "got: x_shape: " << x_shape[0] << ", " << x_shape[1] << " x_strides: " << x_strides[0] << ", " << x_strides[1] << std::endl;
+				std::cerr << "passing: CompileTimeXInnerstride: " << CompileTimeXInnerstride
+				          << " XStride(" << x_strides[XOuterStrideIndex]/sizeof(Scalar) << ", " << x_strides[XInnerStrideIndex]/sizeof(Scalar) << ")" << std::endl;
+				std::cerr << "got: y_shape: " << y_shape[0] << ", " << y_shape[1] << " y_strides: " << y_strides[0] << ", " << y_strides[1] << std::endl;
+				std::cerr << "passing: CompileTimeYInnerstride: " << CompileTimeYInnerstride
+				          << " YStride(" << y_strides[YOuterStrideIndex]/sizeof(Scalar) << ", " << y_strides[YInnerStrideIndex]/sizeof(Scalar) << ")" << std::endl;
+#			endif
+			XMatrix x(x_data, x_shape[0], x_shape[1], XStride(x_strides[XOuterStrideIndex]/sizeof(Scalar), x_strides[XInnerStrideIndex]/sizeof(Scalar)));
+			YMatrix y(y_data, y_shape[0], y_shape[1], YStride(y_strides[YOuterStrideIndex]/sizeof(Scalar), y_strides[YInnerStrideIndex]/sizeof(Scalar)));
 			noalias_assign(x * y);
 #			ifdef DEBUG
 				std::cerr << __PRETTY_FUNCTION__ << " x:" << std::endl << x << std::endl;

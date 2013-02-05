@@ -62,6 +62,11 @@ products as provided by the <`Eigen/Core`_> include.
    course use this function to multiply matrices that are in fact vectors, you just need
    to pay attention to column-vector vs. row-vector distinction this time.
 
+   If both *x* and *y* are contiguous in some way (either C or Fortran, independently),
+   this function takes optimized code path that doesn't involve memory allocation in
+   Eigen; speed gains are noticeable, but not dramatic. No special markup is needed to
+   trigger this. See also :func:`set_is_malloc_allowed`.
+
    :param x: first factor
    :type x: |matrix|
    :param y: second factor
