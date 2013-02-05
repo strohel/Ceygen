@@ -13,6 +13,18 @@ products as provided by the <`Eigen/Core`_> include.
 
 .. module:: ceygen.core
 
+.. function:: set_is_malloc_allowed(allowed)
+
+   Set the internal Eigen flag whether it is allowed to allocate memory on heap.
+
+   If this flag is :obj:`False` and Eigen will try to allocate memory on heap, it will
+   assert which causes :obj:`~exceptions.ValueError` to be raised by Ceygen. This is
+   useful to ensure you use the most optimized code path. Defaults to :obj:`True`.
+   Note: for this to work, Ceygen defines *EIGEN_RUNTIME_NO_MALLOC* preprocessor
+   directive before including Eigen.
+
+   See http://eigen.tuxfamily.org/dox/TopicPreprocessorDirectives.html
+
 .. function:: dot_vv(x, y)
 
    Vector-vector dot product, returns a scalar of appropriate type.

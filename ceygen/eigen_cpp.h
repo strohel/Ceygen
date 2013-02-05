@@ -11,6 +11,7 @@
 // std::runtime_error to Python RuntimeError
 #define eigen_assert(statement) do { if(!(statement)) throw std::invalid_argument(#statement " does not hold in " __FILE__ ":" STRINGIZE(__LINE__)); } while(0)
 #define EIGEN_NO_AUTOMATIC_RESIZING // affects operator=, Ceygen doesn't want resizing
+#define EIGEN_RUNTIME_NO_MALLOC // enables use of set_is_malloc_allowed() in tests
 
 #include <Eigen/Core>
 #include <Eigen/LU> // for Matrix.inverse()

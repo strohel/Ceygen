@@ -15,6 +15,8 @@ try:
 except ImportError:
     skip = None
 
+from ceygen.core import set_is_malloc_allowed
+
 
 class _AssertRaisesContext(object):
     """A context manager used to implement TestCase.assertRaises method, stolen from Python 2.7"""
@@ -68,6 +70,33 @@ class CeygenTestCase(ut.TestCase):
             return context
         with context:
             callableObj(*args, **kwargs)
+
+
+class NoMallocTestCase(CeygenTestCase):
+    """
+    CeygenTestCase sublass that by default runs with Eigen memory allocation disallowed.
+
+    Use "with malloc_allowed:" context manager to suppress it temporarily
+    """
+
+    def setUp(self):
+        # assure that no heap memory allocation in Eigen happens during this test class
+        set_is_malloc_allowed(False)
+
+    def tearDown(self):
+        set_is_malloc_allowed(True)
+
+class malloc_allowed:
+    """Context manager to write with malloc_allowed: ... and be sure that after execution
+    the state is reset to diwallowed no matter whether exception occured"""
+
+    def __enter__(self):
+        set_is_malloc_allowed(True)
+        return self
+
+    def __exit__(self, exc_type, exc_value, tb):
+        set_is_malloc_allowed(False)
+        return False  # let the exceptions fall through
 
 
 if skip is None:

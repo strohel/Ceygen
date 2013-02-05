@@ -5,11 +5,11 @@
 
 import numpy as np
 
-from support import CeygenTestCase
+from support import NoMallocTestCase
 cimport ceygen.elemwise as e
 
 
-class TestElemwise(CeygenTestCase):
+class TestElemwise(NoMallocTestCase):
 
     def test_add_vs(self):
         x_np = np.array([1., 3., 5.])

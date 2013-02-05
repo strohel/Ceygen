@@ -5,11 +5,11 @@
 
 import numpy as np
 
-from support import CeygenTestCase
+from support import NoMallocTestCase, malloc_allowed
 cimport ceygen.core as c
 
 
-class TestCore(CeygenTestCase):
+class TestCore(NoMallocTestCase):
 
     def test_from_readme(self):
         cdef double[:, :] big = np.array([[1., 2., 2.,  0., 0., 0.],
@@ -17,7 +17,7 @@ class TestCore(CeygenTestCase):
         self.assertApproxEqual(c.dot_mm(big[:, 0:2], big[:, 2:4], big[:, 4:6]), [[2., -4.], [6., -8.]])
         self.assertApproxEqual(big, [[1., 2., 2.,  0., 2., -4.],
                                      [3., 4., 0., -2., 6., -8.]])
-        # TODO: the following like makes Python crash - bug in cython?
+        # TODO: the following line makes Python crash - bug in cython?
         #self.assertApproxEqual(c.dot_mm(big[:, 0:2].T, big[:, 2:4], big[:, 4:6]), [[2., -6.], [4., -8.]])
 
     def test_dot_vv(self):
@@ -235,12 +235,34 @@ class TestCore(CeygenTestCase):
         big = np.array([[[1., 2.], [3., 4.]],
                         [[5., 6.], [7., 8.]]])
         eye = np.eye(2)
+
+        # following are still C-contiguous:
         self.assertApproxEqual(c.dot_mm(big[0, :, :], eye), big[0, :, :])
         self.assertApproxEqual(c.dot_mm(big[1, :, :], eye), big[1, :, :])
         self.assertApproxEqual(c.dot_mm(big[:, 0, :], eye), big[:, 0, :])
         self.assertApproxEqual(c.dot_mm(big[:, 1, :], eye), big[:, 1, :])
-        self.assertApproxEqual(c.dot_mm(big[:, :, 0], eye), big[:, :, 0])
-        self.assertApproxEqual(c.dot_mm(big[:, :, 1], eye), big[:, :, 1])
+
+        # following are Fortran-contiguous:
+        self.assertApproxEqual(c.dot_mm(big[0, :, :].T, eye), big[0, :, :].T)
+        self.assertApproxEqual(c.dot_mm(big[1, :, :].T, eye), big[1, :, :].T)
+        self.assertApproxEqual(c.dot_mm(big[:, 0, :].T, eye), big[:, 0, :].T)
+        self.assertApproxEqual(c.dot_mm(big[:, 1, :].T, eye), big[:, 1, :].T)
+
+        # actually test that our infractructure is capable of detecting memory allocations
+        for myslice in (big[:, :, 0], big[:, :, 1], big[:, :, 1].T, big[:, :, 1].T):
+            with self.assertRaises(ValueError):
+                c.dot_mm(myslice, eye)
+
+        # non-contiguous slices in dot_mm cause memory allocations in Eigen, expect it:
+        with malloc_allowed():
+            self.assertApproxEqual(c.dot_mm(big[:, :, 0], eye), big[:, :, 0])
+            self.assertApproxEqual(c.dot_mm(big[:, :, 1], eye), big[:, :, 1])
+            self.assertApproxEqual(c.dot_mm(big[:, :, 0].T, eye), big[:, :, 0].T)
+            self.assertApproxEqual(c.dot_mm(big[:, :, 1].T, eye), big[:, :, 1].T)
+
+        # assert that we've reenabled assertions on memory allocations
+        with self.assertRaises(ValueError):
+            c.dot_mm(big[:, :, 0], eye)
 
     def test_dot_mm_baddims(self):
         x = np.array([[1., 2.],

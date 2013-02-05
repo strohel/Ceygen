@@ -7,7 +7,11 @@
 # declaration. Using just the class without template param everywhere else works
 # well
 
+from libcpp cimport bool
+
 cdef extern from "eigen_cpp.h":
+    void c_set_is_malloc_allowed "internal::set_is_malloc_allowed"(bool) nogil
+
     cdef cppclass BaseMap[Scalar]:
         # "constructor":
         void init(Scalar *, const Py_ssize_t *, const Py_ssize_t *) nogil except +

@@ -10,6 +10,9 @@ from eigen_cython cimport *
 from dtype cimport get_format
 
 
+cpdef bint set_is_malloc_allowed(bint allowed) nogil:
+    c_set_is_malloc_allowed(allowed)
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef dtype dot_vv(dtype[:] x, dtype[:] y) nogil except *:
