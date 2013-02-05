@@ -16,6 +16,9 @@ cdef extern from "eigen_cpp.h":
         void assign(BaseMap) nogil except +
         void assign_inverse(BaseMap) nogil except +
         void noalias_assign(BaseMap) nogil except +
+        void noalias_assign_dot_mm(
+            Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
+            Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides) nogil except +
 
         # exported Eigen methods
         Scalar determinant() nogil except +

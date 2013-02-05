@@ -78,6 +78,23 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 			this->noalias() = rhs;
 		}
 
+		/** Very special optimization for dot_mm: TODO
+		 */
+		inline void noalias_assign_dot_mm(
+				Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
+				Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides)
+		{
+			typedef Stride<Dynamic, Dynamic> MyStride;
+			typedef Map<Matrix<Scalar, Dynamic, Dynamic, RowMajor>, Unaligned, MyStride> MyMatrix;
+			MyMatrix x(x_data, x_shape[0], x_shape[1], MyStride(x_strides[0]/sizeof(Scalar), x_strides[1]/sizeof(Scalar)));
+			MyMatrix y(y_data, y_shape[0], y_shape[1], MyStride(y_strides[0]/sizeof(Scalar), y_strides[1]/sizeof(Scalar)));
+			noalias_assign(x * y);
+#			ifdef DEBUG
+				std::cerr << __PRETTY_FUNCTION__ << " x:" << std::endl << x << std::endl;
+				std::cerr << __PRETTY_FUNCTION__ << " y:" << std::endl << y << std::endl;
+#			endif
+		}
+
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(BaseMap)
 };
 
