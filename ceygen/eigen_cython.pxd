@@ -20,7 +20,6 @@ cdef extern from "eigen_cpp.h":
         # exported Eigen methods
         Scalar determinant() nogil except +
         Scalar dot(BaseMap) nogil except +
-        BaseMap transpose() nogil  # should never raise an Exception
 
         # this is a huge cheat, these operators don't map 1:1 to actual C++ operators at
         # all; but the declarations here are just to tell that the operators are possible..
@@ -30,6 +29,9 @@ cdef extern from "eigen_cpp.h":
         BaseMap operator/(BaseMap) nogil except +
 
     cdef cppclass VectorMap[Scalar](BaseMap):
+        pass
+
+    cdef cppclass RowVectorMap[Scalar](BaseMap):
         pass
 
     cdef cppclass Array1DMap[Scalar](BaseMap):

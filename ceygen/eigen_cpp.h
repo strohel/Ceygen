@@ -34,17 +34,25 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 		typedef Map<BaseType, Unaligned, StrideType> Base;
 		typedef typename Base::Scalar Scalar;
 
-		BaseMap() : Base(0, 0, BaseType::ColsAtCompileTime == Dynamic ? 0 : BaseType::ColsAtCompileTime, StrideType(0, 0)) {}
+		BaseMap() : Base(0,
+				BaseType::RowsAtCompileTime == Dynamic ? 0 : BaseType::RowsAtCompileTime,
+				BaseType::ColsAtCompileTime == Dynamic ? 0 : BaseType::ColsAtCompileTime,
+				StrideType(0, 0)) {}
 
 		inline void init(Scalar *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
-			// see http://eigen.tuxfamily.org/dox/TutorialMapClass.html
-			// this is NOT a heap allocation
-			// Cython has strides in bytes, Eigen in Scalar-long units:
-			new (this) Base(data, shape[0],
-					BaseType::ColsAtCompileTime == Dynamic ? shape[1] : BaseType::ColsAtCompileTime,
+			/* which index inside shape, strides to use as "column" (unless known at compile
+			 * time) and "innerStride" for Eigen? Depends on whether this is a matrix (then
+			 * it should be 1) or a vector, where this should be 0. enum is used just to
+			 * ensure that this is a compile-time constant */
+			enum { ColsShapeIndex = Base::IsVectorAtCompileTime ? 0 : 1 };
+			/* see http://eigen.tuxfamily.org/dox/TutorialMapClass.html - this is NOT a heap allocation
+			 * Note: Cython (and Python) has strides in bytes, Eigen in sizeof(Scalar) units */
+			new (this) Base(data,
+					BaseType::RowsAtCompileTime == Dynamic ? shape[0] : BaseType::RowsAtCompileTime,
+					BaseType::ColsAtCompileTime == Dynamic ? shape[ColsShapeIndex] : BaseType::ColsAtCompileTime,
 					StrideType(
 							StrideType::OuterStrideAtCompileTime == Dynamic ? strides[0]/sizeof(Scalar) : StrideType::OuterStrideAtCompileTime,
-							StrideType::OuterStrideAtCompileTime == Dynamic ? strides[1]/sizeof(Scalar) : strides[0]/sizeof(Scalar)));
+							strides[ColsShapeIndex]/sizeof(Scalar)));
 #			ifdef DEBUG
 				std::cerr << __PRETTY_FUNCTION__ << " rows=" << this->rows() << ", cols=" << this->cols()
 				          << " outerStride=" << this->outerStride() << ", innerStride=" << this->innerStride() << std::endl
@@ -62,7 +70,7 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 		// see above
 		template<typename T>
 		inline void assign_inverse(const T &rhs) {
-			*this = rhs.inverse();
+			assign(rhs.inverse());
 		}
 
 		template<typename T>
@@ -75,6 +83,11 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 
 template<typename dtype>
 class VectorMap : public BaseMap<Matrix<dtype, Dynamic, 1>, Stride<0, Dynamic> >
+{
+};
+
+template<typename dtype>
+class RowVectorMap : public BaseMap<Matrix<dtype, 1, Dynamic>, Stride<0, Dynamic> >
 {
 };
 
