@@ -1,4 +1,4 @@
-recursive-include ceygen *.h
+recursive-include ceygen *.pxd *.h
 recursive-include doc *.py *.rst *.bat Makefile
 recursive-include support *.py
 include *.rst
