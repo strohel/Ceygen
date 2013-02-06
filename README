@@ -129,7 +129,7 @@ Building Options
 
 You can set various build options as it is usual with distutils, see
 ``python setup.py --help``. Notable is the `build_ext` command and its `--include-dirs`
-(standard) and `--cflags`, `--ldflags` (Ceygen extension) options:
+(standard) and following additional options (whose are Ceygen extensions):
 
 --include-dirs
    defaults to `/usr/include/eigen3` and must be specified if you've installed Eigen 3
@@ -142,12 +142,16 @@ You can set various build options as it is usual with distutils, see
 
 --ldflags
    additional flags to pass to linker, defaults to `-fopenmp`. Use standard `--libraries`
-   for specifying extra libraries to link against .
+   for specifying extra libraries to link against,
+
+--annotate
+   pass `--annotate` to Cython to produce annotated HTML files during compiling. Only
+   useful during Ceygen development.
 
 You may want to remove `-fopenmp` from `cflags` and `ldflags` if you are already
 parallelising above Ceygen. The resulting command could look like ``python setup.py -v
-build build_ext --include-dirs=/usr/local/include/eigen3 --cflags="-O3 -march=core2"
---ldflags= test``. The same could be achieved by putting the options to a `setup.cfg` file::
+build_ext --include-dirs=/usr/local/include/eigen3 --cflags="-O3 -march=core2" --ldflags=
+test``. The same could be achieved by putting the options to a `setup.cfg` file::
 
    [build_ext]
    include_dirs = /usr/local/include/eigen3
