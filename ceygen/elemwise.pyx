@@ -4,10 +4,9 @@
 # later version of the license, at your option.
 
 cimport cython
-from cython cimport view
 
 from eigen_cython cimport *
-from dtype cimport get_format
+from dtype cimport vector, matrix
 
 
 @cython.boundscheck(False)
@@ -15,8 +14,7 @@ from dtype cimport get_format
 cdef dtype[:] add_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
     cdef Array1DMap[dtype] x_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&y))
+        out = vector(x.shape[0], &y)
     x_map.init(&x[0], x.shape, x.strides)
     out_map.init(&out[0], out.shape, out.strides)
     out_map.assign(x_map + y)
@@ -27,8 +25,7 @@ cdef dtype[:] add_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
 cdef dtype[:] multiply_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
     cdef Array1DMap[dtype] x_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&y))
+        out = vector(x.shape[0], &y)
     x_map.init(&x[0], x.shape, x.strides)
     out_map.init(&out[0], out.shape, out.strides)
     out_map.assign(x_map * y)
@@ -39,8 +36,7 @@ cdef dtype[:] multiply_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
 cdef dtype[:] add_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef Array1DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0]))
+        out = vector(x.shape[0], &x[0])
     x_map.init(&x[0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
     out_map.init(&out[0], out.shape, out.strides)
@@ -52,8 +48,7 @@ cdef dtype[:] add_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
 cdef dtype[:] subtract_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef Array1DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0]))
+        out = vector(x.shape[0], &x[0])
     x_map.init(&x[0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
     out_map.init(&out[0], out.shape, out.strides)
@@ -65,8 +60,7 @@ cdef dtype[:] subtract_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
 cdef dtype[:] multiply_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef Array1DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0]))
+        out = vector(x.shape[0], &x[0])
     x_map.init(&x[0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
     out_map.init(&out[0], out.shape, out.strides)
@@ -78,8 +72,7 @@ cdef dtype[:] multiply_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
 cdef dtype[:] divide_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef Array1DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0]))
+        out = vector(x.shape[0], &x[0])
     x_map.init(&x[0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
     out_map.init(&out[0], out.shape, out.strides)
@@ -91,8 +84,7 @@ cdef dtype[:] divide_vv(dtype[:] x, dtype[:] y, dtype[:] out = None) nogil:
 cdef dtype[:, :] add_ms(dtype[:, :] x, dtype y, dtype[:, :] out = None) nogil:
     cdef Array2DMap[dtype] x_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&y))
+        out = matrix(x.shape[0], x.shape[1], &y)
     x_map.init(&x[0, 0], x.shape, x.strides)
     out_map.init(&out[0, 0], out.shape, out.strides)
     out_map.assign(x_map + y)
@@ -103,8 +95,7 @@ cdef dtype[:, :] add_ms(dtype[:, :] x, dtype y, dtype[:, :] out = None) nogil:
 cdef dtype[:, :] multiply_ms(dtype[:, :] x, dtype y, dtype[:, :] out = None) nogil:
     cdef Array2DMap[dtype] x_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&y))
+        out = matrix(x.shape[0], x.shape[1], &y)
     x_map.init(&x[0, 0], x.shape, x.strides)
     out_map.init(&out[0, 0], out.shape, out.strides)
     out_map.assign(x_map * y)
@@ -115,8 +106,7 @@ cdef dtype[:, :] multiply_ms(dtype[:, :] x, dtype y, dtype[:, :] out = None) nog
 cdef dtype[:, :] add_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
     cdef Array2DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        out = matrix(x.shape[0], x.shape[1], &x[0, 0])
     x_map.init(&x[0, 0], x.shape, x.strides)
     y_map.init(&y[0, 0], y.shape, y.strides)
     out_map.init(&out[0, 0], out.shape, out.strides)
@@ -128,8 +118,7 @@ cdef dtype[:, :] add_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) no
 cdef dtype[:, :] subtract_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
     cdef Array2DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        out = matrix(x.shape[0], x.shape[1], &x[0, 0])
     x_map.init(&x[0, 0], x.shape, x.strides)
     y_map.init(&y[0, 0], y.shape, y.strides)
     out_map.init(&out[0, 0], out.shape, out.strides)
@@ -141,8 +130,7 @@ cdef dtype[:, :] subtract_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = Non
 cdef dtype[:, :] multiply_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
     cdef Array2DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        out = matrix(x.shape[0], x.shape[1], &x[0, 0])
     x_map.init(&x[0, 0], x.shape, x.strides)
     y_map.init(&y[0, 0], y.shape, y.strides)
     out_map.init(&out[0, 0], out.shape, out.strides)
@@ -154,8 +142,7 @@ cdef dtype[:, :] multiply_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = Non
 cdef dtype[:, :] divide_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
     cdef Array2DMap[dtype] x_map, y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        out = matrix(x.shape[0], x.shape[1], &x[0, 0])
     x_map.init(&x[0, 0], x.shape, x.strides)
     y_map.init(&y[0, 0], y.shape, y.strides)
     out_map.init(&out[0, 0], out.shape, out.strides)

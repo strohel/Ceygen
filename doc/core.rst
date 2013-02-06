@@ -1,9 +1,12 @@
-==============
-Core Functions
-==============
+=============================
+Core Data Types and Functions
+=============================
 
 This module provides basic linear algebra operations such as vector and matrix
 products as provided by the <`Eigen/Core`_> include.
+
+Core Data Types
+===============
 
 .. module:: ceygen.dtype
 
@@ -11,19 +14,35 @@ products as provided by the <`Eigen/Core`_> include.
 
    Cython `fused type`_, currently just a C double (Python :obj:`float`).
 
+.. function:: vector(size, like)
+
+   Convenience function to create a new vector (*cython.view.array*) and return a
+   memoryview of it. This function is declared *with gil* (it can be called without the
+   GIL_ held, but acquires it during execution) and is rather expensive (as many Python
+   calls are done).
+
+   :param int size: number of elements of the desired vector
+   :param like: dummy pointer to desired data type; value not used
+   :type like: :obj:`dtype * <ceygen.dtype.dtype>`
+   :rtype: |vector|
+
+.. function:: matrix(rows, col, like)
+
+   Convenience function to create a new matrix (*cython.view.array*) and return a
+   memoryview of it. This function is declared *with gil* (it can be called without the
+   GIL_ held, but acquires it during execution) and is rather expensive (as many Python
+   calls are done).
+
+   :param int rows: number of rows of the desired matrix
+   :param int cols: number of columns of the desired matrix
+   :param like: dummy pointer to desired data type; value not used
+   :type like: :obj:`dtype * <ceygen.dtype.dtype>`
+   :rtype: |matrix|
+
+Linear Algebra Functions
+========================
+
 .. module:: ceygen.core
-
-.. function:: set_is_malloc_allowed(allowed)
-
-   Set the internal Eigen flag whether it is allowed to allocate memory on heap.
-
-   If this flag is :obj:`False` and Eigen will try to allocate memory on heap, it will
-   assert which causes :obj:`~exceptions.ValueError` to be raised by Ceygen. This is
-   useful to ensure you use the most optimized code path. Defaults to :obj:`True`.
-   Note: for this to work, Ceygen defines *EIGEN_RUNTIME_NO_MALLOC* preprocessor
-   directive before including Eigen.
-
-   See http://eigen.tuxfamily.org/dox/TopicPreprocessorDirectives.html
 
 .. function:: dot_vv(x, y)
 
@@ -88,6 +107,21 @@ products as provided by the <`Eigen/Core`_> include.
    :raises: |valueerror|
    :raises: |typeerror|
    :rtype: |matrix|
+
+Miscellaneous Functions
+=======================
+
+.. function:: set_is_malloc_allowed(allowed)
+
+   Set the internal Eigen flag whether it is allowed to allocate memory on heap.
+
+   If this flag is :obj:`False` and Eigen will try to allocate memory on heap, it will
+   assert which causes :obj:`~exceptions.ValueError` to be raised by Ceygen. This is
+   useful to ensure you use the most optimized code path. Defaults to :obj:`True`.
+   Note: for this to work, Ceygen defines *EIGEN_RUNTIME_NO_MALLOC* preprocessor
+   directive before including Eigen.
+
+   See http://eigen.tuxfamily.org/dox/TopicPreprocessorDirectives.html
 
 .. _`Eigen/Core`: http://eigen.tuxfamily.org/dox/QuickRefPage.html#QuickRef_Headers
 .. _`fused type`: http://docs.cython.org/src/userguide/fusedtypes.html

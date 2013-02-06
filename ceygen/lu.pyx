@@ -4,10 +4,9 @@
 # later version of the license, at your option.
 
 cimport cython
-from cython cimport view
 
 from eigen_cython cimport *
-from dtype cimport get_format
+from dtype cimport matrix
 
 
 @cython.boundscheck(False)
@@ -15,8 +14,7 @@ from dtype cimport get_format
 cdef dtype[:, :] inv(dtype[:, :] x, dtype[:, :] out = None) nogil:
     cdef MatrixMap[dtype] x_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],x.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        out = matrix(x.shape[0], x.shape[1], &x[0, 0])
     x_map.init(&x[0, 0], x.shape, x.strides)
     out_map.init(&out[0, 0], out.shape, out.strides)
     out_map.assign_inverse(x_map)

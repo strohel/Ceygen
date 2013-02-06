@@ -4,10 +4,9 @@
 # later version of the license, at your option.
 
 cimport cython
-from cython cimport view
 
 from eigen_cython cimport *
-from dtype cimport get_format
+from dtype cimport vector, matrix
 
 
 cpdef bint set_is_malloc_allowed(bint allowed) nogil:
@@ -27,8 +26,7 @@ cdef dtype[:] dot_mv(dtype[:, :] x, dtype[:] y, dtype[:] out = None) nogil:
     cdef MatrixMap[dtype] x_map
     cdef VectorMap[dtype] y_map, out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        out = vector(x.shape[0], &y[0])
     x_map.init(&x[0, 0], x.shape, x.strides)
     y_map.init(&y[0], y.shape, y.strides)
     out_map.init(&out[0], out.shape, out.strides)
@@ -43,8 +41,7 @@ cdef dtype[:] dot_vm(dtype[:] x, dtype[:, :] y, dtype[:] out = None) nogil:
     cdef RowVectorMap[dtype] x_map, out_map
     cdef MatrixMap[dtype] y_map
     if out is None:
-        with gil:
-            out = view.array(shape=(y.shape[1],), itemsize=sizeof(dtype), format=get_format(&y[0, 0]))
+        out = vector(y.shape[1], &x[0])
     x_map.init(&x[0], x.shape, x.strides)
     y_map.init(&y[0, 0], y.shape, y.strides)
     out_map.init(&out[0], out.shape, out.strides)
@@ -56,8 +53,7 @@ cdef dtype[:] dot_vm(dtype[:] x, dtype[:, :] y, dtype[:] out = None) nogil:
 cdef dtype[:, :] dot_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
     cdef MatrixMap[dtype] out_map
     if out is None:
-        with gil:
-            out = view.array(shape=(x.shape[0],y.shape[1]), itemsize=sizeof(dtype), format=get_format(&x[0, 0]))
+        out = matrix(x.shape[0], y.shape[1], &x[0, 0])
     out_map.init(&out[0, 0], out.shape, out.strides)
 
     # ternary decision tree; this needs to be fast, sorry about it

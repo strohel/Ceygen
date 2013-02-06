@@ -5,7 +5,7 @@
 
 # When adding new type:
 #  * add it to ctypedef fused dtype
-#  * add it to get_format()
+#  * add it to get_format() in dtype.pyx
 #  * update documentation in doc/core.rst
 #  * rebuild Ceygen!
 
@@ -13,12 +13,5 @@ ctypedef fused dtype:
 #    float
     double
 
-cdef inline str get_format(dtype *dummy):
-    """
-    This function must return Type code for all data types in `dtype` as described in
-    table at http://docs.python.org/library/array.html
-    """
-    #if dtype is float:
-        #return 'f'
-    if dtype is double:
-        return 'd'
+cdef dtype[:] vector(int size, dtype *like) with gil
+cdef dtype[:, :] matrix(int rows, int cols, dtype *like) with gil
