@@ -15,6 +15,7 @@ class CeygenDistribution(Distribution):
 
     def __init__(self, attrs):
         self.cflags = None  # Default CFLAGS overridable by setup.cfg
+        self.ldflags = None  # Default LDFLAGS overridable by setup.cfg
         Distribution.__init__(self, attrs)
         self.cmdclass['build'] = build
         self.cmdclass['build_ext'] = build_ext

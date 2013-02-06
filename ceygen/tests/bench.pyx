@@ -39,7 +39,7 @@ class Bench(CeygenTestCase):
         cdef int iterations
         cdef double[:, :] x, x_nocontig, y, out
 
-        for size in (2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 100):
+        for size in (2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024):
             x_np = np.random.rand(size, size)
             #x_nocontig_np = np.random.rand(size, size, 2)[:, :, 0]
             y_np = np.random.rand(size, size)
@@ -50,7 +50,7 @@ class Bench(CeygenTestCase):
             out = out_np
 
             cost = 2. * size**3.
-            iterations = min(2. * 10.**9. / cost, 1000000)
+            iterations = min(max(2. * 10.**9. / cost, 1), 1000000)
             print "size: {0}x{0}, iterations: {1}".format(size, iterations)
             align = 8
 

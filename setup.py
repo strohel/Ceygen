@@ -24,7 +24,8 @@ setup(
     distclass=CeygenDistribution,
     ext_modules=modules,
     include_dirs=['/usr/include/eigen3'],  # default overridable by setup.cfg
-    cflags=['-O2', '-march=native'],  # ditto
+    cflags=['-O2', '-march=native', '-fopenmp'],  # ditto
+    ldflags=['-fopenmp'],  # ditto
 
     # meta-data; see http://docs.python.org/distutils/setupscript.html#additional-meta-data
     name='Ceygen',
