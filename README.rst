@@ -166,10 +166,13 @@ and can be exported into a variety of formats using Sphinx_ (version at least 1.
 Just type ``make`` in that directory to see a list of supported formats and for example
 ``make html`` to build HTML pages with the documentation.
 
+See ``ChangeLog.rst`` file for changes between versions or `view it online`_.
+
 **On-line documentation** is available at http://strohel.github.com/Ceygen-doc/
 
 .. _reStructuredText: http://sphinx-doc.org/rest.html
 .. _Sphinx: http://sphinx-doc.org/
+.. _`view it online`: http://strohel.github.com/Ceygen-doc/ChangeLog.html
 
 Bugs
 ====

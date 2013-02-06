@@ -6,6 +6,7 @@ Ceygen API Documentation
    :maxdepth: 2
 
    README
+   ChangeLog
    core
    elemwise
    lu

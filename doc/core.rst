@@ -95,8 +95,8 @@ Linear Algebra Functions
 
    If both *x* and *y* are contiguous in some way (either C or Fortran, independently),
    this function takes optimized code path that doesn't involve memory allocation in
-   Eigen; speed gains are noticeable, but not dramatic. No special markup is needed to
-   trigger this. See also :func:`set_is_malloc_allowed`.
+   Eigen; speed gains are around 40% for matrices around 2\*2 -- 24\*24 size. No special
+   markup is needed to trigger this. See also :func:`set_is_malloc_allowed`.
 
    :param x: first factor
    :type x: |matrix|
