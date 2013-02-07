@@ -16,7 +16,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU> // for Matrix.inverse()
 
-#include <Python.h>
+#include <Python.h> // for Py_ssize_t
 
 #ifdef DEBUG
 #include <iostream>
@@ -24,12 +24,19 @@
 
 using namespace Eigen;
 
-// for noalias_assign_dot_mm():
-enum Contiguity {
-	NoContig,
-	CContig,
-	FContig
-};
+// dummy compile time-only classes to differentiate between various contiguity types
+struct CContig { enum {
+	Layout = RowMajor,
+	InnerStride = 1
+};};
+struct FContig { enum {
+	Layout = ColMajor,
+	InnerStride = 1
+};};
+struct NContig { enum {
+	Layout = RowMajor,
+	InnerStride = Dynamic
+};};
 
 /**
  * Very simple Eigen::Map<> subclass that provides default constructor and lets
@@ -45,26 +52,46 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 		BaseMap() : Base(0,
 				BaseType::RowsAtCompileTime == Dynamic ? 0 : BaseType::RowsAtCompileTime,
 				BaseType::ColsAtCompileTime == Dynamic ? 0 : BaseType::ColsAtCompileTime,
-				StrideType(0, 0)) {}
+				StrideType(
+						StrideType::OuterStrideAtCompileTime == Dynamic ? 0 : StrideType::OuterStrideAtCompileTime,
+						StrideType::InnerStrideAtCompileTime == Dynamic ? 0 : StrideType::InnerStrideAtCompileTime
+				)
+		) {}
 
 		inline void init(Scalar *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
-			/* which index inside shape, strides to use as "column" (unless known at compile
-			 * time) and "innerStride" for Eigen? Depends on whether this is a matrix (then
-			 * it should be 1) or a vector, where this should be 0. enum is used just to
-			 * ensure that this is a compile-time constant */
-			enum { ColsShapeIndex = Base::IsVectorAtCompileTime ? 0 : 1 };
+			// enum is used just to ensure that this is a compile-time constant
+			enum {
+				/* which index inside shape, strides to use as "column" (unless known at
+				 * compile time) and "innerStride" for Eigen? Depends on whether this is
+				 * a matrix (then it should be 1) or a vector, where this should be 0. */
+				ColsShapeIndex = Base::IsVectorAtCompileTime ? 0 : 1,
+				OuterStrideIndex = (BaseType::Options & RowMajor) ? 0 : 1,
+			};
+
+#			ifdef DEBUG
+				std::cerr << __PRETTY_FUNCTION__ << std::endl;
+				std::cerr << "got: shape: " << shape[0] << ", " << shape[1] << " strides: " << strides[0] << ", " << strides[1] << std::endl;
+				std::cerr << "got: RowsAtCompileTime: " << BaseType::RowsAtCompileTime << " ColsAtCompileTime: " << BaseType::ColsAtCompileTime << " Options: " << BaseType::Options << std::endl;
+				std::cerr << "got: OuterStrideAtCompileTime: " << StrideType::OuterStrideAtCompileTime << " InnerStrideAtCompileTime: " << StrideType::InnerStrideAtCompileTime << std::endl;
+#			endif
+
 			/* see http://eigen.tuxfamily.org/dox/TutorialMapClass.html - this is NOT a heap allocation
 			 * Note: Cython (and Python) has strides in bytes, Eigen in sizeof(Scalar) units */
 			new (this) Base(data,
 					BaseType::RowsAtCompileTime == Dynamic ? shape[0] : BaseType::RowsAtCompileTime,
 					BaseType::ColsAtCompileTime == Dynamic ? shape[ColsShapeIndex] : BaseType::ColsAtCompileTime,
 					StrideType(
-							StrideType::OuterStrideAtCompileTime == Dynamic ? strides[0]/sizeof(Scalar) : StrideType::OuterStrideAtCompileTime,
-							strides[ColsShapeIndex]/sizeof(Scalar)));
+							StrideType::OuterStrideAtCompileTime == Dynamic ? strides[OuterStrideIndex]/sizeof(Scalar) : StrideType::OuterStrideAtCompileTime,
+							StrideType::InnerStrideAtCompileTime == Dynamic ? strides[ColsShapeIndex]/sizeof(Scalar) : StrideType::InnerStrideAtCompileTime
+					)
+			);
 #			ifdef DEBUG
-				std::cerr << __PRETTY_FUNCTION__ << " rows=" << this->rows() << ", cols=" << this->cols()
-				          << " outerStride=" << this->outerStride() << ", innerStride=" << this->innerStride() << std::endl
-				          << *this << std::endl;
+				std::cerr << "rows=" << this->rows() << ", cols=" << this->cols()
+				          << " outerStride=" << this->outerStride() << ", innerStride=" << this->innerStride() << std::endl;
+				bool malloc_allowed = internal::is_malloc_allowed();
+				internal::set_is_malloc_allowed(true);
+				std::cerr << *this << std::endl;
+				internal::set_is_malloc_allowed(malloc_allowed);
 #			endif
 		};
 
@@ -84,46 +111,6 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 		template<typename T>
 		inline void noalias_assign(const T &rhs) {
 			this->noalias() = rhs;
-		}
-
-		/* Very special optimization for dot_mm: Eigen resorts to allocating new memory
-		 * and copying the data if the arrays in matrix product don't have compile
-		 * time-fixed innerStride. Make it fixed in cases of contiguous arrays. */
-		template<Contiguity XContiguity, Contiguity YContiguity>
-		inline void noalias_assign_dot_mm(
-				Scalar *x_data, const Py_ssize_t *x_shape, const Py_ssize_t *x_strides,
-				Scalar *y_data, const Py_ssize_t *y_shape, const Py_ssize_t *y_strides)
-		{
-			enum {
-				CompileTimeXInnerstride = (XContiguity == NoContig) ? Dynamic : 1,
-				CompileTimeYInnerstride = (YContiguity == NoContig) ? Dynamic : 1,
-				XLayout = (XContiguity == FContig) ? ColMajor : RowMajor, // NoContig defaults to RowMajor
-				YLayout = (YContiguity == FContig) ? ColMajor : RowMajor, // NoContig defaults to RowMajor
-				// following justs swaps inner/outer stride indices for F-contiguos matrices:
-				XOuterStrideIndex = (XContiguity == FContig) ? 1 : 0,
-				YOuterStrideIndex = (YContiguity == FContig) ? 1 : 0,
-				XInnerStrideIndex = (XContiguity == FContig) ? 0 : 1,
-				YInnerStrideIndex = (YContiguity == FContig) ? 0 : 1,
-			};
-			typedef Stride<Dynamic, CompileTimeXInnerstride> XStride;
-			typedef Stride<Dynamic, CompileTimeYInnerstride> YStride;
-			typedef Map<Matrix<Scalar, Dynamic, Dynamic, XLayout>, Unaligned, XStride> XMatrix;
-			typedef Map<Matrix<Scalar, Dynamic, Dynamic, YLayout>, Unaligned, YStride> YMatrix;
-#			ifdef DEBUG
-				std::cerr << "got: x_shape: " << x_shape[0] << ", " << x_shape[1] << " x_strides: " << x_strides[0] << ", " << x_strides[1] << std::endl;
-				std::cerr << "passing: CompileTimeXInnerstride: " << CompileTimeXInnerstride
-				          << " XStride(" << x_strides[XOuterStrideIndex]/sizeof(Scalar) << ", " << x_strides[XInnerStrideIndex]/sizeof(Scalar) << ")" << std::endl;
-				std::cerr << "got: y_shape: " << y_shape[0] << ", " << y_shape[1] << " y_strides: " << y_strides[0] << ", " << y_strides[1] << std::endl;
-				std::cerr << "passing: CompileTimeYInnerstride: " << CompileTimeYInnerstride
-				          << " YStride(" << y_strides[YOuterStrideIndex]/sizeof(Scalar) << ", " << y_strides[YInnerStrideIndex]/sizeof(Scalar) << ")" << std::endl;
-#			endif
-			XMatrix x(x_data, x_shape[0], x_shape[1], XStride(x_strides[XOuterStrideIndex]/sizeof(Scalar), x_strides[XInnerStrideIndex]/sizeof(Scalar)));
-			YMatrix y(y_data, y_shape[0], y_shape[1], YStride(y_strides[YOuterStrideIndex]/sizeof(Scalar), y_strides[YInnerStrideIndex]/sizeof(Scalar)));
-			noalias_assign(x * y);
-#			ifdef DEBUG
-				std::cerr << __PRETTY_FUNCTION__ << " x:" << std::endl << x << std::endl;
-				std::cerr << __PRETTY_FUNCTION__ << " y:" << std::endl << y << std::endl;
-#			endif
 		}
 
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(BaseMap)
@@ -146,6 +133,11 @@ class Array1DMap : public BaseMap<Array<dtype, Dynamic, 1>, Stride<0, Dynamic> >
 
 template<typename dtype>
 class MatrixMap : public BaseMap<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Stride<Dynamic, Dynamic> >
+{
+};
+
+template<typename dtype, typename ContiguityType>
+class MatrixMapTODO : public BaseMap<Matrix<dtype, Dynamic, Dynamic, ContiguityType::Layout>, Stride<Dynamic, ContiguityType::InnerStride> >
 {
 };
 

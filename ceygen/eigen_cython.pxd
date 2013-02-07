@@ -9,6 +9,9 @@
 
 from libcpp cimport bool
 
+from dtype cimport dtype
+
+
 cdef extern from "eigen_cpp.h":
     void c_set_is_malloc_allowed "internal::set_is_malloc_allowed"(bool) nogil
 
@@ -62,7 +65,74 @@ cdef extern from "eigen_cpp.h":
     cdef cppclass MatrixMap[Scalar](BaseMap):
         pass
 
+    cdef cppclass MatrixMapTODO[Scalar, ContiguityType](BaseMap):
+        pass
+
     cdef cppclass Array2DMap[Scalar](BaseMap):
         # http://trac.cython.org/cython_trac/ticket/800
         BaseMap operator+(Scalar) nogil except +
         BaseMap operator*(Scalar) nogil except +
+
+    # dummy classes to differentiate between various contiguity types
+    cdef cppclass CContig:
+        pass
+    cdef cppclass FContig:
+        pass
+    cdef cppclass NContig:
+        pass
+
+
+ctypedef fused XMatrixContiguity:
+    CContig
+    FContig
+    NContig
+
+ctypedef fused YMatrixContiguity:
+    CContig
+    FContig
+    NContig
+
+ctypedef fused OMatrixContiguity:
+    CContig
+    FContig
+    NContig
+
+cdef inline bint dispatch_mmm(
+        dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides,
+        dtype *y_data, Py_ssize_t *y_shape, Py_ssize_t *y_strides,
+        dtype *o_data, Py_ssize_t *o_shape, Py_ssize_t *o_strides,
+        bint (*ccn)(dtype *, Py_ssize_t *, Py_ssize_t *, CContig, dtype *, Py_ssize_t *, Py_ssize_t *, CContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*cfn)(dtype *, Py_ssize_t *, Py_ssize_t *, CContig, dtype *, Py_ssize_t *, Py_ssize_t *, FContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*cnn)(dtype *, Py_ssize_t *, Py_ssize_t *, CContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*fcn)(dtype *, Py_ssize_t *, Py_ssize_t *, FContig, dtype *, Py_ssize_t *, Py_ssize_t *, CContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*ffn)(dtype *, Py_ssize_t *, Py_ssize_t *, FContig, dtype *, Py_ssize_t *, Py_ssize_t *, FContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*fnn)(dtype *, Py_ssize_t *, Py_ssize_t *, FContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*ncn)(dtype *, Py_ssize_t *, Py_ssize_t *, NContig, dtype *, Py_ssize_t *, Py_ssize_t *, CContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*nfn)(dtype *, Py_ssize_t *, Py_ssize_t *, NContig, dtype *, Py_ssize_t *, Py_ssize_t *, FContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        bint (*nnn)(dtype *, Py_ssize_t *, Py_ssize_t *, NContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig, dtype *, Py_ssize_t *, Py_ssize_t *, NContig) nogil except False,
+        ) nogil except -1:
+    # workaround for Cython crash when NoContig() etc is used in-place as argument:
+    cdef NContig ncontig
+    cdef CContig ccontig
+    cdef FContig fcontig
+    if x_strides[1] == sizeof(dtype):
+        if y_strides[1] == sizeof(dtype):
+            return ccn(x_data, x_shape, x_strides, ccontig, y_data, y_shape, y_strides, ccontig, o_data, o_shape, o_strides, ncontig)
+        elif y_strides[0] == sizeof(dtype):
+            return cfn(x_data, x_shape, x_strides, ccontig, y_data, y_shape, y_strides, fcontig, o_data, o_shape, o_strides, ncontig)
+        else:
+            return cnn(x_data, x_shape, x_strides, ccontig, y_data, y_shape, y_strides, ncontig, o_data, o_shape, o_strides, ncontig)
+    elif x_strides[0] == sizeof(dtype):
+        if y_strides[1] == sizeof(dtype):
+            return fcn(x_data, x_shape, x_strides, fcontig, y_data, y_shape, y_strides, ccontig, o_data, o_shape, o_strides, ncontig)
+        elif y_strides[0] == sizeof(dtype):
+            return ffn(x_data, x_shape, x_strides, fcontig, y_data, y_shape, y_strides, fcontig, o_data, o_shape, o_strides, ncontig)
+        else:
+            return fnn(x_data, x_shape, x_strides, fcontig, y_data, y_shape, y_strides, ncontig, o_data, o_shape, o_strides, ncontig)
+    else:
+        if y_strides[1] == sizeof(dtype):
+            return ncn(x_data, x_shape, x_strides, ncontig, y_data, y_shape, y_strides, ccontig, o_data, o_shape, o_strides, ncontig)
+        elif y_strides[0] == sizeof(dtype):
+            return nfn(x_data, x_shape, x_strides, ncontig, y_data, y_shape, y_strides, fcontig, o_data, o_shape, o_strides, ncontig)
+        else:
+            return nnn(x_data, x_shape, x_strides, ncontig, y_data, y_shape, y_strides, ncontig, o_data, o_shape, o_strides, ncontig)
