@@ -4,12 +4,15 @@
 # later version of the license, at your option.
 
 import numpy as np
-np_dot = np.dot
+cdef object np_dot = np.dot
+cdef object np_add = np.add
+cdef object np_multiply = np.multiply
 
 from time import time
 
 from support import CeygenTestCase, benchmark
 cimport ceygen.core as c
+cimport ceygen.elemwise as e
 
 
 class timeit:
@@ -33,38 +36,71 @@ class timeit:
 
 class Bench(CeygenTestCase):
 
+    sizes = (2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024)
+    align = 8
+
     @benchmark
     def test_bench_dot_mm(self):
         print
         cdef int iterations
-        cdef double[:, :] x, x_nocontig, y, out
-
-        for size in (2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024):
+        cdef double[:, :] x, y, out
+        for size in self.sizes:
             x_np = np.random.rand(size, size)
-            #x_nocontig_np = np.random.rand(size, size, 2)[:, :, 0]
             y_np = np.random.rand(size, size)
             out_np = np.empty((size, size))
-            x = x_np
-            #x_nocontig = x_nocontig_np
-            y = y_np
-            out = out_np
+            x, y, out = x_np, y_np, out_np
 
             cost = 2. * size**3.
             iterations = min(max(2. * 10.**9. / cost, 1), 1000000)
-            print "size: {0}x{0}, iterations: {1}".format(size, iterations)
-            align = 8
+            print "size: {0}*{0}, iterations: {1}".format(size, iterations)
 
-            with timeit("numpy", align, iterations, cost):
+            with timeit("numpy", self.align, iterations, cost):
                 for i in range(iterations):
                     np_dot(x_np, y_np, out_np)
-            with timeit("ceygen", align, iterations, cost):
+            with timeit("ceygen", self.align, iterations, cost):
                 for i in range(iterations):
                     c.dot_mm(x, y, out)
 
-            #iterations /= 3
-            #with timeit("numpy-nocontig", align, iterations, cost):
-                #for i in range(iterations):
-                    #np_dot(x_nocontig_np, y_np, out_np)
-            #with timeit("ceygen-nocontig", align, iterations, cost):
-                #for i in range(iterations):
-                    #c.dot_mm(x_nocontig, y, out)
+    @benchmark
+    def test_bench_add_vv(self):
+        print
+        cdef int iterations
+        cdef double[:] x, out
+
+        for size in self.sizes:
+            x_np = np.random.rand(size)
+            out_np = np.empty(size)
+            x, out = x_np, out_np
+
+            cost = size
+            iterations = min(0.25 * 10.**9 / cost, 1000000)
+            print "size: {0}, iterations: {1}".format(size, iterations)
+
+            with timeit("numpy", self.align, iterations, cost):
+                for i in range(iterations):
+                    np_add(x_np, x_np, out_np)
+            with timeit("ceygen", self.align, iterations, cost):
+                for i in range(iterations):
+                    e.add_vv(x, x, out)
+
+    @benchmark
+    def test_bench_multiply_mm(self):
+        print
+        cdef int iterations
+        cdef double[:, :] x, out
+
+        for size in self.sizes:
+            x_np = np.random.rand(size, size)
+            out_np = np.empty((size, size))
+            x, out = x_np, out_np
+
+            cost = size**2.
+            iterations = min(0.25 * 10.**9 / cost, 1000000)
+            print "size: {0}*{0}, iterations: {1}".format(size, iterations)
+
+            with timeit("numpy", self.align, iterations, cost):
+                for i in range(iterations):
+                    np_multiply(x_np, x_np, out_np)
+            with timeit("ceygen", self.align, iterations, cost):
+                for i in range(iterations):
+                    e.multiply_mm(x, x, out)
