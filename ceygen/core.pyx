@@ -66,11 +66,11 @@ cdef bint dot_mm_worker(
 cdef dtype[:, :] dot_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = None) nogil:
     if out is None:
         out = matrix(x.shape[0], y.shape[1], &x[0, 0])
-    dispatch_mmm(&x[0, 0], x.shape, x.strides,
-                 &y[0, 0], y.shape, y.strides,
-                 &out[0, 0], out.shape, out.strides,
-                 dot_mm_worker, dot_mm_worker, dot_mm_worker,
-                 dot_mm_worker, dot_mm_worker, dot_mm_worker,
-                 dot_mm_worker, dot_mm_worker, dot_mm_worker,
-                )
+    dispatch_mmm(&x[0, 0], x.shape, x.strides, &y[0, 0], y.shape, y.strides,
+            &out[0, 0], out.shape, out.strides, dot_mm_worker, dot_mm_worker, dot_mm_worker,
+            dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker,
+            dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker,
+            dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker,
+            dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker, dot_mm_worker,
+    )
     return out
