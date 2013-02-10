@@ -128,5 +128,5 @@ if skip is None:
 
 def benchmark(func):
     """Decorator to mark functions as benchmarks so that they aren't run by default"""
-    reason = 'because BENCHMARK environment variable is not set'
-    return skipUnless('BENCHMARK' in os.environ, reason)(func)
+    reason = 'because neither BENCHMARK or BENCHMARK_NUMPY environment variable is set'
+    return skipUnless('BENCHMARK' in os.environ or 'BENCHMARK_NUMPY' in os.environ, reason)(func)

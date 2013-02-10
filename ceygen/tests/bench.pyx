@@ -8,6 +8,7 @@ cdef object np_dot = np.dot
 cdef object np_add = np.add
 cdef object np_multiply = np.multiply
 
+import os
 from time import time
 
 from support import CeygenTestCase, benchmark
@@ -20,6 +21,9 @@ class timeit:
 
     def __init__(self, name, align, iterations, cost):
         self.iterations, self.cost = iterations, cost
+        self.execute = True
+        if name == 'numpy' and 'BENCHMARK_NUMPY' not in os.environ:
+            self.execute = False
         self.name = name.rjust(align)
 
     def __enter__(self):
@@ -28,9 +32,12 @@ class timeit:
 
     def __exit__(self, exc_type, exc_value, tb):
         self.elapsed = time() - self.elapsed
-        percall = self.elapsed/self.iterations
-        print "{0}: {1:.2e}s per call, {2:.3f}s total, {3:5.2f} GFLOPS".format(self.name,
-              percall, self.elapsed, self.cost/percall/10.**9)
+        if self.execute:
+            percall = self.elapsed/self.iterations
+            print "{0}: {1:.2e}s per call, {2:.3f}s total, {3:5.2f} GFLOPS".format(self.name,
+                percall, self.elapsed, self.cost/percall/10.**9)
+        else:
+            assert self.elapsed < 0.01
         return False  # let the exceptions fall through
 
 
@@ -54,12 +61,14 @@ class Bench(CeygenTestCase):
             iterations = min(max(2. * 10.**9. / cost, 1), 1000000)
             print "size: {0}*{0}, iterations: {1}".format(size, iterations)
 
-            with timeit("numpy", self.align, iterations, cost):
-                for i in range(iterations):
-                    np_dot(x_np, y_np, out_np)
-            with timeit("ceygen", self.align, iterations, cost):
-                for i in range(iterations):
-                    c.dot_mm(x, y, out)
+            with timeit("numpy", self.align, iterations, cost) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        np_dot(x_np, y_np, out_np)
+            with timeit("ceygen", self.align, iterations, cost) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        c.dot_mm(x, y, out)
 
     @benchmark
     def test_bench_add_vv(self):
@@ -76,12 +85,14 @@ class Bench(CeygenTestCase):
             iterations = min(0.25 * 10.**9 / cost, 1000000)
             print "size: {0}, iterations: {1}".format(size, iterations)
 
-            with timeit("numpy", self.align, iterations, cost):
-                for i in range(iterations):
-                    np_add(x_np, x_np, out_np)
-            with timeit("ceygen", self.align, iterations, cost):
-                for i in range(iterations):
-                    e.add_vv(x, x, out)
+            with timeit("numpy", self.align, iterations, cost) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        np_add(x_np, x_np, out_np)
+            with timeit("ceygen", self.align, iterations, cost) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        e.add_vv(x, x, out)
 
     @benchmark
     def test_bench_multiply_mm(self):
@@ -98,9 +109,11 @@ class Bench(CeygenTestCase):
             iterations = min(0.25 * 10.**9 / cost, 1000000)
             print "size: {0}*{0}, iterations: {1}".format(size, iterations)
 
-            with timeit("numpy", self.align, iterations, cost):
-                for i in range(iterations):
-                    np_multiply(x_np, x_np, out_np)
-            with timeit("ceygen", self.align, iterations, cost):
-                for i in range(iterations):
-                    e.multiply_mm(x, x, out)
+            with timeit("numpy", self.align, iterations, cost) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        np_multiply(x_np, x_np, out_np)
+            with timeit("ceygen", self.align, iterations, cost) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        e.multiply_mm(x, x, out)
