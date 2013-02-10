@@ -9,6 +9,8 @@ cdef object np_add = np.add
 cdef object np_multiply = np.multiply
 
 import os
+import pickle
+import subprocess
 from time import time
 
 from support import CeygenTestCase, benchmark
@@ -19,12 +21,13 @@ cimport ceygen.elemwise as e
 class timeit:
     """Simple context manager to time interations of the block inside"""
 
-    def __init__(self, name, align, iterations, cost):
-        self.iterations, self.cost = iterations, cost
+    def __init__(self, func, implementation, args):
+        self.func, self.iterations, self.cost = func, args['iterations'], args['cost']
+        self.stats = args['self'].stats
         self.execute = True
-        if name == 'numpy' and 'BENCHMARK_NUMPY' not in os.environ:
+        if implementation == 'numpy' and 'BENCHMARK_NUMPY' not in os.environ:
             self.execute = False
-        self.name = name.rjust(align)
+        self.implementation = implementation.rjust(args['self'].align)
 
     def __enter__(self):
         self.elapsed = time()
@@ -34,8 +37,13 @@ class timeit:
         self.elapsed = time() - self.elapsed
         if self.execute:
             percall = self.elapsed/self.iterations
-            print "{0}: {1:.2e}s per call, {2:.3f}s total, {3:5.2f} GFLOPS".format(self.name,
-                percall, self.elapsed, self.cost/percall/10.**9)
+            gflops = self.cost/percall/10.**9
+            print "{0}: {1:.2e}s per call, {2:.3f}s total, {3:5.2f} GFLOPS".format(
+                self.implementation, percall, self.elapsed, gflops)
+            if self.implementation.endswith('ceygen') and isinstance(self.stats, dict):
+                if self.func not in self.stats:
+                    self.stats[self.func] = []
+                self.stats[self.func].append(gflops)
         else:
             assert self.elapsed < 0.01
         return False  # let the exceptions fall through
@@ -43,12 +51,28 @@ class timeit:
 
 class Bench(CeygenTestCase):
 
-    sizes = (2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024)
     align = 8
+
+    def setUp(self):
+        self.sizes = (2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024)
+        if 'SAVE' in os.environ:
+            self.stats = {}
+        else:
+            self.stats = None
+
+    def tearDown(self):
+        if self.stats:
+            for (func, stats) in self.stats.iteritems():
+                filename = func
+                filename += b'-' + subprocess.check_output(['git', 'describe', '--dirty']).strip()
+                filename += b'.pickle'
+                with open(filename, 'wb') as f:
+                    pickle.dump({'sizes': self.sizes, 'stats': stats}, f)
+                    print "Saved stats to {0}".format(filename)
 
     @benchmark
     def test_bench_dot_mm(self):
-        print
+        print __doc__
         cdef int iterations
         cdef double[:, :] x, y, out
         for size in self.sizes:
@@ -61,11 +85,11 @@ class Bench(CeygenTestCase):
             iterations = min(max(2. * 10.**9. / cost, 1), 1000000)
             print "size: {0}*{0}, iterations: {1}".format(size, iterations)
 
-            with timeit("numpy", self.align, iterations, cost) as context:
+            with timeit(b"dot_mm", "numpy", locals()) as context:
                 if context.execute:
-                    for i in range(iterations):
+                    for i in range(context.iterations):
                         np_dot(x_np, y_np, out_np)
-            with timeit("ceygen", self.align, iterations, cost) as context:
+            with timeit(b"dot_mm", "ceygen", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
                         c.dot_mm(x, y, out)
@@ -85,11 +109,11 @@ class Bench(CeygenTestCase):
             iterations = min(0.25 * 10.**9 / cost, 1000000)
             print "size: {0}, iterations: {1}".format(size, iterations)
 
-            with timeit("numpy", self.align, iterations, cost) as context:
+            with timeit(b"add_vv", "numpy", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
                         np_add(x_np, x_np, out_np)
-            with timeit("ceygen", self.align, iterations, cost) as context:
+            with timeit(b"add_vv", "ceygen", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
                         e.add_vv(x, x, out)
@@ -109,11 +133,11 @@ class Bench(CeygenTestCase):
             iterations = min(0.25 * 10.**9 / cost, 1000000)
             print "size: {0}*{0}, iterations: {1}".format(size, iterations)
 
-            with timeit("numpy", self.align, iterations, cost) as context:
+            with timeit(b"multiply_mm", "numpy", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
                         np_multiply(x_np, x_np, out_np)
-            with timeit("ceygen", self.align, iterations, cost) as context:
+            with timeit(b"multiply_mm", "ceygen", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
                         e.multiply_mm(x, x, out)
