@@ -22,21 +22,8 @@
 #include <iostream>
 #endif
 
-using namespace Eigen;
 
-// dummy compile time-only classes to differentiate between various contiguity types
-struct CContig { enum {
-	Layout = RowMajor,
-	InnerStride = 1
-};};
-struct FContig { enum {
-	Layout = ColMajor,
-	InnerStride = 1
-};};
-struct NContig { enum {
-	Layout = RowMajor,
-	InnerStride = Dynamic
-};};
+using namespace Eigen;
 
 /**
  * Very simple Eigen::Map<> subclass that provides default constructor and lets
@@ -116,32 +103,27 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(BaseMap)
 };
 
-template<typename dtype>
-class VectorMap : public BaseMap<Matrix<dtype, Dynamic, 1>, Stride<0, Dynamic> >
-{
-};
-
-template<typename dtype>
-class RowVectorMap : public BaseMap<Matrix<dtype, 1, Dynamic>, Stride<0, Dynamic> >
-{
-};
-
-template<typename dtype>
-class Array1DMap : public BaseMap<Array<dtype, Dynamic, 1>, Stride<0, Dynamic> >
-{
-};
-
-template<typename dtype>
-class MatrixMap : public BaseMap<Matrix<dtype, Dynamic, Dynamic, RowMajor>, Stride<Dynamic, Dynamic> >
+template<typename dtype, typename ContiguityType>
+class VectorMap : public BaseMap<Matrix<dtype, Dynamic, 1>, Stride<0, ContiguityType::InnerStride> >
 {
 };
 
 template<typename dtype, typename ContiguityType>
-class MatrixMapTODO : public BaseMap<Matrix<dtype, Dynamic, Dynamic, ContiguityType::Layout>, Stride<Dynamic, ContiguityType::InnerStride> >
+class RowVectorMap : public BaseMap<Matrix<dtype, 1, Dynamic>, Stride<0, ContiguityType::InnerStride> >
 {
 };
 
-template<typename dtype>
-class Array2DMap : public BaseMap<Array<dtype, Dynamic, Dynamic, RowMajor>, Stride<Dynamic, Dynamic> >
+template<typename dtype, typename ContiguityType>
+class Array1DMap : public BaseMap<Array<dtype, Dynamic, 1>, Stride<0, ContiguityType::InnerStride> >
+{
+};
+
+template<typename dtype, typename ContiguityType>
+class MatrixMap : public BaseMap<Matrix<dtype, Dynamic, Dynamic, ContiguityType::Layout>, Stride<Dynamic, ContiguityType::InnerStride> >
+{
+};
+
+template<typename dtype, typename ContiguityType>
+class Array2DMap : public BaseMap<Array<dtype, Dynamic, Dynamic, ContiguityType::Layout>, Stride<Dynamic, ContiguityType::InnerStride> >
 {
 };
