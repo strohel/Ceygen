@@ -16,6 +16,7 @@ from time import time
 from support import CeygenTestCase, benchmark
 cimport ceygen.core as c
 cimport ceygen.elemwise as e
+cimport ceygen.lu as lu
 
 
 class timeit:
@@ -70,11 +71,77 @@ class Bench(CeygenTestCase):
                     pickle.dump({'sizes': self.sizes, 'stats': stats}, f)
                     print "Saved stats to {0}".format(filename)
 
+    # core module
+
+    @benchmark
+    def test_bench_dot_vv(self):
+        print
+        cdef int iterations
+        cdef double[:] x
+
+        for size in self.sizes:
+            x_np = np.random.rand(size)
+            x = x_np
+
+            cost = 2. * size
+            iterations = min(1.0 * 10.**9 / cost, 1000000)
+            print "size: {0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"dot_vv", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        c.dot_vv(x, x)
+
+    @benchmark
+    def test_bench_dot_mv(self):
+        print
+        cdef int iterations
+        cdef double[:, :] x
+        cdef double[:] y, out
+
+        for size in self.sizes:
+            x_np = np.random.rand(size, size)
+            y_np = np.random.rand(size)
+            out_np = np.empty(size)
+            x, y, out = x_np, y_np, out_np
+
+            cost = 2. * size**2.
+            iterations = min(0.5 * 10.**9. / cost, 1000000)
+            print "size: {0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"dot_mv", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        c.dot_mv(x, y, out)
+
+    @benchmark
+    def test_bench_dot_vm(self):
+        print
+        cdef int iterations
+        cdef double[:] x, out
+        cdef double[:, :] y
+
+        for size in self.sizes:
+            x_np = np.random.rand(size)
+            y_np = np.random.rand(size, size)
+            out_np = np.empty(size)
+            x, y, out = x_np, y_np, out_np
+
+            cost = 2. * size**2.
+            iterations = min(0.5 * 10.**9. / cost, 1000000)
+            print "size: {0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"dot_vm", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        c.dot_vm(x, y, out)
+
     @benchmark
     def test_bench_dot_mm(self):
-        print __doc__
+        print
         cdef int iterations
         cdef double[:, :] x, y, out
+
         for size in self.sizes:
             x_np = np.random.rand(size, size)
             y_np = np.random.rand(size, size)
@@ -93,6 +160,28 @@ class Bench(CeygenTestCase):
                 if context.execute:
                     for i in range(iterations):
                         c.dot_mm(x, y, out)
+
+    # elemwise module
+
+    @benchmark
+    def test_bench_multiply_vs(self):
+        print
+        cdef int iterations
+        cdef double[:] x, out
+
+        for size in self.sizes:
+            x_np = np.random.rand(size)
+            out_np = np.empty(size)
+            x, out = x_np, out_np
+
+            cost = size
+            iterations = min(0.25 * 10.**9 / cost, 1000000)
+            print "size: {0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"multiply_vs", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        e.multiply_vs(x, 12., out)
 
     @benchmark
     def test_bench_add_vv(self):
@@ -119,6 +208,26 @@ class Bench(CeygenTestCase):
                         e.add_vv(x, x, out)
 
     @benchmark
+    def test_bench_add_ms(self):
+        print
+        cdef int iterations
+        cdef double[:, :] x, out
+
+        for size in self.sizes:
+            x_np = np.random.rand(size, size)
+            out_np = np.empty((size, size))
+            x, out = x_np, out_np
+
+            cost = size**2.
+            iterations = min(0.25 * 10.**9 / cost, 1000000)
+            print "size: {0}*{0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"add_ms", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        e.add_ms(x, -11., out)
+
+    @benchmark
     def test_bench_multiply_mm(self):
         print
         cdef int iterations
@@ -141,3 +250,63 @@ class Bench(CeygenTestCase):
                 if context.execute:
                     for i in range(iterations):
                         e.multiply_mm(x, x, out)
+
+    # lu module
+
+    @benchmark
+    def test_bench_inv(self):
+        print
+        cdef int iterations
+        cdef double[:, :] x, out
+
+        for size in self.sizes:
+            x_np = np.random.rand(size, size)
+            out_np = np.empty((size, size))
+            x, out = x_np, out_np
+
+            cost = size**3.  # 2/3 * n^3 floating point operations, but additional logic operations
+            iterations = min(max(0.25 * 10.**9. / cost, 1), 1000000)
+            print "size: {0}*{0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"inv", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        lu.inv(x, out)
+
+    @benchmark
+    def test_bench_iinv(self):
+        print
+        cdef int iterations
+        cdef double[:, :] x
+
+        for size in self.sizes:
+            x_np = np.random.rand(size, size)
+            x = x_np
+
+            cost = size**3.  # 2/3 * n^3 floating point operations, but additional logic operations
+            iterations = min(max(0.25 * 10.**9. / cost, 1), 1000000)
+            print "size: {0}*{0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"iinv", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        lu.iinv(x)
+
+    @benchmark
+    def test_bench_det(self):
+        print
+        cdef int iterations
+        cdef double[:, :] x
+
+        for size in self.sizes:
+            x_np = np.random.rand(size, size)
+            x = x_np
+
+            cost = 2./3. * size**3.
+            iterations = min(max(0.5 * 10.**9. / cost, 1), 1000000)
+            print "size: {0}*{0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"det", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        lu.det(x)
