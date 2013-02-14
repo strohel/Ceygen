@@ -5,6 +5,7 @@
 
 from Cython.Build import cythonize
 
+import os
 from distutils.command.build_ext import build_ext as orig_build_ext
 
 
@@ -26,6 +27,9 @@ class build_ext(orig_build_ext):
 
     def finalize_options(self):
         orig_build_ext.finalize_options(self)
+        ceygenpath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ceygen')
+        self.include_dirs.insert(0, ceygenpath)
+
         if self.cflags is None:
             self.cflags = self.distribution.cflags or []
         if isinstance(self.cflags, str):
