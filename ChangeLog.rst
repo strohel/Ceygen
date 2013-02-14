@@ -10,6 +10,10 @@ recent versions and changes are mentioned on top.
 Changes in 0.2 since 0.1
 ========================
 
+*  Simple benchmarks for many functions have been added, define ``BENCHMARK`` or
+   ``BENCHMARK_NUMPY`` environment variable during test execution to run them; define
+   ``SAVE`` environment variable to save timings into ``.pickle`` files that can be
+   visualized by ``support/visualize_stats.py``.
 *  Added code paths optimized for C-contiguous and F-contiguous matrices and vectors using
    fancy C++ dispatching code. Rougly 40% speed gains in :func:`core.dot_mm` (for common
    matrix sizes), 300% gains for :func:`core.dot_mv` and :func:`core.dot_vm` starting with
@@ -21,5 +25,3 @@ Changes in 0.2 since 0.1
 *  :func:`dtype.vector` and :func:`dtype.matrix` convenience functions added; their usage
    in other modules leads to speedups because it circumvents Cython shortcoming.
 *  :func:`core.set_is_malloc_allowed` added to aid in debugging and tests.
-*  Simple benchmark was added, define ``BENCHMARK`` environment variable during test
-   execution to run it.
