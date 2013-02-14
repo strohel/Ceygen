@@ -3,10 +3,7 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
-"""This file needs to be cimported *after* eigen_cython.pxd"""
-
-
-cdef extern from "dispatch.h":
+cdef extern from "<dispatch.h>":
     # dummy classes to differentiate between various contiguity types
     cdef cppclass CContig:
         pass

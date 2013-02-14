@@ -2,6 +2,8 @@
  * Distributed under the terms of the GNU General Public License v2 or any
  * later version of the license, at your option. */
 
+#ifndef EIGEN_CPP_H
+#define EIGEN_CPP_H
 // two macros ensures any macro passed will be expanded before being stringified
 #define STRINGIZE_DETAIL(x) #x
 #define STRINGIZE(x) STRINGIZE_DETAIL(x)
@@ -127,3 +129,5 @@ template<typename dtype, typename ContiguityType>
 class Array2DMap : public BaseMap<Array<dtype, Dynamic, Dynamic, ContiguityType::Layout>, Stride<Dynamic, ContiguityType::InnerStride> >
 {
 };
+
+#endif // EIGEN_CPP_H

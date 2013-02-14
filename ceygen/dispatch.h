@@ -2,7 +2,9 @@
  * Distributed under the terms of the GNU General Public License v2 or any
  * later version of the license, at your option. */
 
-#include <Python.h> // for Py_ssize_t
+#ifndef DISPATCH_H
+#define DISPATCH_H
+#include "eigen_cpp.h"
 
 
 // dummy compile time-only classes to differentiate between various contiguity types
@@ -45,8 +47,9 @@ struct VVSDispatcher
 			aas_func(ccs, CContig, CContig), aas_func(cns, CContig, NContig),
 			aas_func(ncs, NContig, CContig), aas_func(nns, NContig, NContig))
 	{
-		// it is better to just store function pointer inside the if/else branches, because
-		// calling a function with a lot of parameters generates a lot of code which then causes cache misses
+		/* it is better to just store function pointer inside the if/else branches,
+		 * because calling a function with a lot of parameters generates a lot of
+		 * (conditional) code which then causes cache misses */
 		VVSFuncs tocall;
 		if(x_strides[0] == sizeof(dtype)) {
 			if(y_strides[0] == sizeof(dtype))
@@ -59,7 +62,12 @@ struct VVSDispatcher
 			else
 				tocall.nns = nns;
 		}
-		// this is a vile hack! TODO
+		/* Following is a vile hack! We pretend to call the nns variant, alhough the
+		 * pointer may point to any of the variants stored in the union. This works because
+		 * the functions only differ in CContig/FContig/NContig arguments, and all these
+		 * are empty structures, which must have same (no) memory representation, thus
+		 * all the functions must have the same call signature. Another alternative would
+		 * be to cast function pointer, but abusing union was deemed slightly less ugly. */
 		tocall.nns(x_data, x_shape, x_strides, NContig(), y_data, y_shape, y_strides, NContig(), o);
 	}
 };
@@ -343,3 +351,5 @@ struct MMMDispatcher
 		tocall.nnn(x_data, x_shape, x_strides, NContig(), y_data, y_shape, y_strides, NContig(), o_data, o_shape, o_strides, NContig());
 	}
 };
+
+#endif // DISPATCH_H
