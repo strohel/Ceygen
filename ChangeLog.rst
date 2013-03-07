@@ -10,6 +10,8 @@ recent versions and changes are mentioned on top.
 Changes in 0.2 since 0.1
 ========================
 
+*  :mod:`~ceygen.reductions` module was added with vector, matrix, row-wise and column-wise
+   sums.
 *  Simple benchmarks for many functions have been added, define ``BENCHMARK`` or
    ``BENCHMARK_NUMPY`` environment variable during test execution to run them; define
    ``SAVE`` environment variable to save timings into ``.pickle`` files that can be

@@ -25,6 +25,10 @@ struct NContig { enum {
 #define as_func(name, XContigType) \
 void (*name)(dtype *, Py_ssize_t *, Py_ssize_t *, XContigType, dtype *)
 
+// function taking memview, memoryview arguments
+#define aa_func(name, XContigType, OContigType) \
+void (*name)(dtype *, Py_ssize_t *, Py_ssize_t *, XContigType, dtype *, Py_ssize_t *, Py_ssize_t *, OContigType)
+
 // function taking memview, memview, scalar pointer arguments
 #define aas_func(name, XContigType, YContigType) \
 void (*name)(dtype *, Py_ssize_t *, Py_ssize_t *, XContigType, dtype *, Py_ssize_t *, Py_ssize_t *, YContigType, dtype *)
@@ -32,6 +36,34 @@ void (*name)(dtype *, Py_ssize_t *, Py_ssize_t *, XContigType, dtype *, Py_ssize
 // function taking three memview arguments
 #define aaa_func(name, XContigType, YContigType, OContigType) \
 void (*name)(dtype *, Py_ssize_t *, Py_ssize_t *, XContigType, dtype *, Py_ssize_t *, Py_ssize_t *, YContigType, dtype *, Py_ssize_t *, Py_ssize_t *, OContigType)
+
+template<typename dtype>
+struct VSDispatcher
+{
+	union VSFuncs {
+		as_func(c, CContig); as_func(n, NContig);
+	};
+
+	inline void run(dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides,
+			dtype *o, as_func(c, CContig), as_func(n, NContig))
+	{
+		/* it is better to just store function pointer inside the if/else branches,
+		 * because calling a function with a lot of parameters generates a lot of
+		 * (conditional) code which then causes cache misses */
+		VSFuncs tocall;
+		if(x_strides[0] == sizeof(dtype))
+			tocall.c = c;
+		else
+			tocall.n = n;
+		/* Following is a vile hack! We pretend to call the nns variant, alhough the
+		 * pointer may point to any of the variants stored in the union. This works because
+		 * the functions only differ in CContig/FContig/NContig arguments, and all these
+		 * are empty structures, which must have same (no) memory representation, thus
+		 * all the functions must have the same call signature. Another alternative would
+		 * be to cast function pointer, but abusing union was deemed slightly less ugly. */
+		tocall.n(x_data, x_shape, x_strides, NContig(), o);
+	}
+};
 
 template<typename dtype>
 struct VVSDispatcher
@@ -47,9 +79,6 @@ struct VVSDispatcher
 			aas_func(ccs, CContig, CContig), aas_func(cns, CContig, NContig),
 			aas_func(ncs, NContig, CContig), aas_func(nns, NContig, NContig))
 	{
-		/* it is better to just store function pointer inside the if/else branches,
-		 * because calling a function with a lot of parameters generates a lot of
-		 * (conditional) code which then causes cache misses */
 		VVSFuncs tocall;
 		if(x_strides[0] == sizeof(dtype)) {
 			if(y_strides[0] == sizeof(dtype))
@@ -62,12 +91,6 @@ struct VVSDispatcher
 			else
 				tocall.nns = nns;
 		}
-		/* Following is a vile hack! We pretend to call the nns variant, alhough the
-		 * pointer may point to any of the variants stored in the union. This works because
-		 * the functions only differ in CContig/FContig/NContig arguments, and all these
-		 * are empty structures, which must have same (no) memory representation, thus
-		 * all the functions must have the same call signature. Another alternative would
-		 * be to cast function pointer, but abusing union was deemed slightly less ugly. */
 		tocall.nns(x_data, x_shape, x_strides, NContig(), y_data, y_shape, y_strides, NContig(), o);
 	}
 };
@@ -139,6 +162,42 @@ struct MSDispatcher
 		else
 			tocall.n = n;
 		tocall.n(x_data, x_shape, x_strides, NContig(), o);
+	}
+};
+
+template<typename dtype>
+struct MVDispatcher
+{
+	union MVFuncs {
+		aa_func(cc, CContig, CContig); aa_func(cn, CContig, NContig);
+		aa_func(fc, FContig, CContig); aa_func(fn, FContig, NContig);
+		aa_func(nc, NContig, CContig); aa_func(nn, NContig, NContig);
+	};
+
+	inline void run(dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides,
+			dtype *o_data, Py_ssize_t *o_shape, Py_ssize_t *o_strides,
+			aa_func(cc, CContig, CContig), aa_func(cn, CContig, NContig),
+			aa_func(fc, FContig, CContig), aa_func(fn, FContig, NContig),
+			aa_func(nc, NContig, CContig), aa_func(nn, NContig, NContig))
+	{
+		MVFuncs tocall;
+		if(x_strides[1] == sizeof(dtype)) {
+			if(o_strides[0] == sizeof(dtype))
+				tocall.cc = cc;
+			else
+				tocall.cn = cn;
+		} else if(x_strides[0] == sizeof(dtype)) {
+			if(o_strides[0] == sizeof(dtype))
+				tocall.fc = fc;
+			else
+				tocall.fn = fn;
+		} else {
+			if(o_strides[0] == sizeof(dtype))
+				tocall.nc = nc;
+			else
+				tocall.nn = nn;
+		}
+		tocall.nn(x_data, x_shape, x_strides, NContig(), o_data, o_shape, o_strides, NContig());
 	}
 };
 

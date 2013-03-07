@@ -12,6 +12,13 @@ cdef extern from "<dispatch.h>":
     cdef cppclass NContig:
         pass
 
+    cdef cppclass VSDispatcher[Scalar]:
+        void run(Scalar *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides,
+                 Scalar *o,
+                 void (*c)(Scalar *, Py_ssize_t *, Py_ssize_t *, CContig, Scalar *) nogil,
+                 void (*n)(Scalar *, Py_ssize_t *, Py_ssize_t *, NContig, Scalar *) nogil,
+        ) nogil except +
+
     cdef cppclass VVSDispatcher[Scalar]:
         void run(Scalar *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides,
                  Scalar *y_data, Py_ssize_t *y_shape, Py_ssize_t *y_strides,
@@ -42,6 +49,17 @@ cdef extern from "<dispatch.h>":
                  void (*c)(Scalar *, Py_ssize_t *, Py_ssize_t *, CContig, Scalar *) nogil,
                  void (*f)(Scalar *, Py_ssize_t *, Py_ssize_t *, FContig, Scalar *) nogil,
                  void (*n)(Scalar *, Py_ssize_t *, Py_ssize_t *, NContig, Scalar *) nogil,
+        ) nogil except +
+
+    cdef cppclass MVDispatcher[Scalar]:
+        void run(Scalar *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides,
+                 Scalar *o_data, Py_ssize_t *o_shape, Py_ssize_t *o_strides,
+                 void (*cc)(Scalar *, Py_ssize_t *, Py_ssize_t *, CContig, Scalar *, Py_ssize_t *, Py_ssize_t *, CContig) nogil,
+                 void (*cn)(Scalar *, Py_ssize_t *, Py_ssize_t *, CContig, Scalar *, Py_ssize_t *, Py_ssize_t *, NContig) nogil,
+                 void (*fc)(Scalar *, Py_ssize_t *, Py_ssize_t *, FContig, Scalar *, Py_ssize_t *, Py_ssize_t *, CContig) nogil,
+                 void (*fn)(Scalar *, Py_ssize_t *, Py_ssize_t *, FContig, Scalar *, Py_ssize_t *, Py_ssize_t *, NContig) nogil,
+                 void (*nc)(Scalar *, Py_ssize_t *, Py_ssize_t *, NContig, Scalar *, Py_ssize_t *, Py_ssize_t *, CContig) nogil,
+                 void (*nn)(Scalar *, Py_ssize_t *, Py_ssize_t *, NContig, Scalar *, Py_ssize_t *, Py_ssize_t *, NContig) nogil,
         ) nogil except +
 
     cdef cppclass MMSDispatcher[Scalar]:

@@ -23,6 +23,25 @@ cdef void as_func(
     if XMatrixContiguity is NContig:
         globalstatus += 'N'
 
+cdef void aa_func(
+        double *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XMatrixContiguity x_dummy,
+        double *y_data, Py_ssize_t *y_shape, Py_ssize_t *y_strides, YMatrixContiguity y_dummy) with gil:
+    global globalstatus
+    globalstatus = ''
+    if XMatrixContiguity is CContig:
+        globalstatus += 'C'
+    if XMatrixContiguity is FContig:
+        globalstatus += 'F'
+    if XMatrixContiguity is NContig:
+        globalstatus += 'N'
+
+    if YMatrixContiguity is CContig:
+        globalstatus += 'C'
+    if YMatrixContiguity is FContig:
+        globalstatus += 'F'
+    if YMatrixContiguity is NContig:
+        globalstatus += 'N'
+
 cdef void aas_func(
         double *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XMatrixContiguity x_dummy,
         double *y_data, Py_ssize_t *y_shape, Py_ssize_t *y_strides, YMatrixContiguity y_dummy,
@@ -80,6 +99,15 @@ m_ncontig = (np.array([[[1., 2.], [3., 4.]],
 
 class TestDispatch(CeygenTestCase):
 
+    def test_vs(self):
+        cdef VSDispatcher[double] dispatcher
+        cdef double[:] x
+        for X in (v_ccontig, v_ncontig):
+                x = X[0]
+                dispatcher.run(&x[0], x.shape, x.strides, <double *> 0,
+                        as_func, as_func)
+                self.assertEquals(globalstatus, X[1])
+
     def test_vvs(self):
         cdef VVSDispatcher[double] dispatcher
         cdef double[:] x, y
@@ -110,6 +138,17 @@ class TestDispatch(CeygenTestCase):
                 dispatcher.run(&x[0, 0], x.shape, x.strides, <double *> 0,
                         as_func, as_func, as_func)
                 self.assertEquals(globalstatus, X[1])
+
+    def test_mv(self):
+        cdef MVDispatcher[double] dispatcher
+        cdef double[:, :] x
+        cdef double[:] y
+        for X in (m_ccontig, m_fcontig, m_ncontig):
+            for Y in (v_ccontig, v_ncontig):
+                x, y = X[0], Y[0]
+                dispatcher.run(&x[0, 0], x.shape, x.strides, &y[0], y.shape, y.strides,
+                        aa_func, aa_func, aa_func, aa_func, aa_func, aa_func)
+                self.assertEquals(globalstatus, X[1] + Y[1])
 
     def test_mms(self):
         cdef MMSDispatcher[double] dispatcher

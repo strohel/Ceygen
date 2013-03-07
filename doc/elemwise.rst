@@ -11,9 +11,7 @@ and produce expected results::
    ceygen.elemwise.add_mm(x, y, x)
    ceygen.elemwise.multiply_vv(a, b, b)
 
-.. note:: This module exists only as a stop-gap until support for element-wise operations
-   with memoryviews is implemented in Cython. It will be phased out once Cython with Mark
-   Florisson's `array expressions`_ `pull request`_ merged is released.
+.. note:: |arrayexprs|
 
 .. module:: ceygen.elemwise
 
@@ -204,8 +202,5 @@ Matrix-matrix Operations
    :raises: |valueerror|
    :raises: |typeerror|
    :rtype: |matrix|
-
-.. _`array expressions`: https://github.com/markflorisson88/minivect/raw/master/thesis/thesis.pdf
-.. _`pull request`: https://github.com/cython/cython/pull/144
 
 .. include:: definitions.rst

@@ -10,6 +10,7 @@ Ceygen API Documentation
    core
    elemwise
    lu
+   reductions
 
 Indices and tables
 ==================

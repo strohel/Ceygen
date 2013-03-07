@@ -27,6 +27,10 @@ cdef extern from "<eigen_cpp.h>":
         # exported Eigen methods
         Scalar determinant() nogil
         Scalar dot(BaseMap) nogil
+        # a little hack so that we don't have to introduce VectorwiseOp cppclass
+        BaseMap colwise_sum "colwise().sum"() nogil
+        BaseMap rowwise_sum "rowwise().sum"() nogil
+        Scalar sum() nogil
 
         # this is a huge cheat, these operators don't map 1:1 to actual C++ operators at
         # all; but the declarations here are just to tell that the operators are possible..
