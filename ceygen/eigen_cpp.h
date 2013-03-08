@@ -50,11 +50,10 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 		inline void init(Scalar *data, const Py_ssize_t *shape, const Py_ssize_t *strides) {
 			// enum is used just to ensure that this is a compile-time constant
 			enum {
-				/* which index inside shape, strides to use as "column" (unless known at
-				 * compile time) and "innerStride" for Eigen? Depends on whether this is
-				 * a matrix (then it should be 1) or a vector, where this should be 0. */
+				RowsShapeIndex = 0, // for both vectors and matrices; entry exists just for symmetry
 				ColsShapeIndex = Base::IsVectorAtCompileTime ? 0 : 1,
-				OuterStrideIndex = (BaseType::Options & RowMajor) ? 0 : 1,
+				OuterStrideIndex = (BaseType::Options & RowMajor) ? 0 : 1, // only used for matrices
+				InnerStrideIndex = Base::IsVectorAtCompileTime ? 0 : ((BaseType::Options & RowMajor) ? 1 : 0),
 			};
 
 #			ifdef DEBUG
@@ -62,16 +61,17 @@ class BaseMap : public Map<BaseType, Unaligned, StrideType>
 				std::cerr << "got: shape: " << shape[0] << ", " << shape[1] << " strides: " << strides[0] << ", " << strides[1] << std::endl;
 				std::cerr << "got: RowsAtCompileTime: " << BaseType::RowsAtCompileTime << " ColsAtCompileTime: " << BaseType::ColsAtCompileTime << " Options: " << BaseType::Options << std::endl;
 				std::cerr << "got: OuterStrideAtCompileTime: " << StrideType::OuterStrideAtCompileTime << " InnerStrideAtCompileTime: " << StrideType::InnerStrideAtCompileTime << std::endl;
+				std::cerr << "got: RowsShapeIndex: " << RowsShapeIndex << " ColsShapeIndex: " << ColsShapeIndex << " OuterStrideIndex: " << OuterStrideIndex << " InnerStrideIndex: " << InnerStrideIndex << std::endl;
 #			endif
 
 			/* see http://eigen.tuxfamily.org/dox/TutorialMapClass.html - this is NOT a heap allocation
 			 * Note: Cython (and Python) has strides in bytes, Eigen in sizeof(Scalar) units */
 			new (this) Base(data,
-					BaseType::RowsAtCompileTime == Dynamic ? shape[0] : BaseType::RowsAtCompileTime,
+					BaseType::RowsAtCompileTime == Dynamic ? shape[RowsShapeIndex] : BaseType::RowsAtCompileTime,
 					BaseType::ColsAtCompileTime == Dynamic ? shape[ColsShapeIndex] : BaseType::ColsAtCompileTime,
 					StrideType(
-							StrideType::OuterStrideAtCompileTime == Dynamic ? strides[OuterStrideIndex]/sizeof(Scalar) : StrideType::OuterStrideAtCompileTime,
-							StrideType::InnerStrideAtCompileTime == Dynamic ? strides[ColsShapeIndex]/sizeof(Scalar) : StrideType::InnerStrideAtCompileTime
+							Base::IsVectorAtCompileTime ? 0 : strides[OuterStrideIndex]/sizeof(Scalar),
+							strides[InnerStrideIndex]/sizeof(Scalar)
 					)
 			);
 #			ifdef DEBUG
