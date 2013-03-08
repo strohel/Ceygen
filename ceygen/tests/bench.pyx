@@ -109,6 +109,10 @@ class Bench(CeygenTestCase):
             iterations = min(0.5 * 10.**9. / cost, 1000000)
             print "size: {0}, iterations: {1}".format(size, iterations)
 
+            with timeit(b"dot_mv", "numpy", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        np_dot(x_np, y_np, out_np)
             with timeit(b"dot_mv", "ceygen", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
@@ -131,6 +135,10 @@ class Bench(CeygenTestCase):
             iterations = min(0.5 * 10.**9. / cost, 1000000)
             print "size: {0}, iterations: {1}".format(size, iterations)
 
+            with timeit(b"dot_vm", "numpy", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        np_dot(x_np, y_np, out_np)
             with timeit(b"dot_vm", "ceygen", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
