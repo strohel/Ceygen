@@ -12,7 +12,7 @@ from libcpp cimport bool
 from dtype cimport dtype
 
 
-cdef extern from "<eigen_cpp.h>":
+cdef extern from "eigen_cpp.h":
     void c_set_is_malloc_allowed "internal::set_is_malloc_allowed"(bool) nogil
 
     cdef cppclass BaseMap[Scalar]:
