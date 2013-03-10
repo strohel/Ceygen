@@ -34,7 +34,7 @@ setup(
 
     # meta-data; see http://docs.python.org/distutils/setupscript.html#additional-meta-data
     name='Ceygen',
-    version="0.2-pre",
+    version="0.2",
     author='Matěj Laitl',
     author_email='matej@laitl.cz',
     maintainer='Matěj Laitl',
