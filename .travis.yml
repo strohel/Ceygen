@@ -6,11 +6,6 @@ python:
   - 3.2
   - 3.3
 
-matrix:
-  allow_failures:
-    # NumPy has problems building on Python 3.3, make it non-fatal
-    - python: 3.3
-
 install:
   - sudo apt-get install -qq libeigen3-dev
   - pip install cython --use-mirrors
