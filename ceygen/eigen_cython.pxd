@@ -31,6 +31,7 @@ cdef extern from "eigen_cpp.h":
         BaseMap colwise_sum "colwise().sum"() nogil
         BaseMap rowwise_sum "rowwise().sum"() nogil
         Scalar sum() nogil
+        BaseMap pow(Scalar) nogil
 
         # this is a huge cheat, these operators don't map 1:1 to actual C++ operators at
         # all; but the declarations here are just to tell that the operators are possible..

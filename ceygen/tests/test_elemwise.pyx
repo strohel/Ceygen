@@ -87,6 +87,44 @@ class TestElemwise(NoMallocTestCase):
             e.multiply_vs(None, 3.)
 
 
+    def test_power_vs(self):
+        x_np = np.array([1., 3., -5.])
+        y_np = 2.
+        expected = np.array([1., 9., 25.])
+
+        self.assertApproxEqual(e.power_vs(x_np, y_np), expected)
+        out_np = np.empty(3)
+        out2 = e.power_vs(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected)
+
+        cdef double[:] x = x_np
+        cdef double y = y_np
+        self.assertApproxEqual(e.power_vs(x, y), expected)
+        out_np[:] = -123.  # reset so that we would catch errors
+        cdef double[:] out = out_np
+        out2 = e.power_vs(x, y, out)
+        self.assertApproxEqual(out, expected)
+        self.assertApproxEqual(out2, expected)
+
+    def test_power_vs_baddims(self):
+        x = np.array([1., 2., 3.])
+        y = 3.
+        out = np.empty(3)
+
+        for X in (x, np.array([1., 2.])):
+            for OUT in (out, np.empty(1), np.empty(4)):
+                if X is x and OUT is out:
+                    e.power_vs(X, y, OUT)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.power_vs(X, y, OUT)
+
+    def test_power_vs_none(self):
+        with self.assertRaises(ValueError):
+            e.power_vs(None, 3.)
+
+
     def test_add_vv(self):
         x_np = np.array([1., 3., 5.])
         y_np = np.array([3., 2., 1.])
@@ -355,6 +393,45 @@ class TestElemwise(NoMallocTestCase):
     def test_multiply_ms_none(self):
         with self.assertRaises(ValueError):
             e.multiply_ms(None, 3.)
+
+
+    def test_power_ms(self):
+        x_np = np.array([[1., 3., -5.]])
+        y_np = 2.
+        expected = np.array([[1., 9., 25.]])
+
+        self.assertApproxEqual(e.power_ms(x_np, y_np), expected)
+        self.assertApproxEqual(e.power_ms(x_np.T, y_np), expected.T)
+        out_np = np.empty((1, 3))
+        out2 = e.power_ms(x_np, y_np, out_np)
+        self.assertApproxEqual(out_np, expected)  # test that it actually uses out
+        self.assertApproxEqual(out2, expected)
+
+        cdef double[:, :] x = x_np
+        cdef double y = y_np
+        self.assertApproxEqual(e.power_ms(x, y), expected)
+        out_np[:, :] = -123.  # reset so that we would catch errors
+        cdef double[:, :] out = out_np
+        out2 = e.power_ms(x, y, out)
+        self.assertApproxEqual(out, expected)
+        self.assertApproxEqual(out2, expected)
+
+    def test_power_ms_baddims(self):
+        x = np.array([[1., 2., 3.]])
+        y = 3.
+        out = np.empty((1, 3))
+
+        for X in (x, np.array([[1., 2.]]), np.array([1., 2.])):
+            for OUT in (out, np.empty((1, 1)), np.empty((1, 4)), np.empty(3)):
+                if X is x and OUT is out:
+                    e.power_ms(X, y, OUT)  # this should be valid
+                    continue
+                with self.assertRaises(ValueError):
+                    e.power_ms(X, y, OUT)
+
+    def test_power_ms_none(self):
+        with self.assertRaises(ValueError):
+            e.power_ms(None, 3.)
 
 
     def test_add_mm(self):

@@ -40,9 +40,23 @@ Vector-scalar Operations
 
    Note: there's no **divide_vs**, just multiply by inverse number.
 
-   :param x: first addend (vector)
+   :param x: first factor (vector)
    :type x: |vector|
-   :param y: second addend (scalar)
+   :param y: second factor (scalar)
+   :type y: |scalar|
+   :param out: |out_elemwise|
+   :type out: |vector|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |vector|
+
+.. function:: power_vs(x, y[, out=None])
+
+   Compute *y*-th power of each coefficient of vector *x*.
+
+   :param x: base (vector)
+   :type x: |vector|
+   :param y: exponent (scalar)
    :type y: |scalar|
    :param out: |out_elemwise|
    :type out: |vector|
@@ -134,9 +148,23 @@ Matrix-scalar Operations
 
    Note: there's no **divide_ms**, just multiply by inverse number.
 
-   :param x: first addend (vector)
+   :param x: first factor (vector)
    :type x: |matrix|
-   :param y: second addend (scalar)
+   :param y: second factor (scalar)
+   :type y: |scalar|
+   :param out: |out_elemwise|
+   :type out: |matrix|
+   :raises: |valueerror|
+   :raises: |typeerror|
+   :rtype: |matrix|
+
+.. function:: power_ms(x, y[, out=None])
+
+   Compute *y*-th power of each coefficient of matrix *x*.
+
+   :param x: base (matrix)
+   :type x: |matrix|
+   :param y: exponent (scalar)
    :type y: |scalar|
    :param out: |out_elemwise|
    :type out: |matrix|

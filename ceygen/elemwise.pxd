@@ -8,6 +8,7 @@ from dtype cimport dtype
 
 cdef dtype[:] add_vs(dtype[:] x, dtype y, dtype[:] out = *) nogil
 cdef dtype[:] multiply_vs(dtype[:] x, dtype y, dtype[:] out = *) nogil
+cdef dtype[:] power_vs(dtype[:] x, dtype y, dtype[:] out = *) nogil
 
 cdef dtype[:] add_vv(dtype[:] x, dtype[:] y, dtype[:] out = *) nogil
 cdef dtype[:] subtract_vv(dtype[:] x, dtype[:] y, dtype[:] out = *) nogil
@@ -16,6 +17,7 @@ cdef dtype[:] divide_vv(dtype[:] x, dtype[:] y, dtype[:] out = *) nogil
 
 cdef dtype[:, :] add_ms(dtype[:, :] x, dtype y, dtype[:, :] out = *) nogil
 cdef dtype[:, :] multiply_ms(dtype[:, :] x, dtype y, dtype[:, :] out = *) nogil
+cdef dtype[:, :] power_ms(dtype[:, :] x, dtype y, dtype[:, :] out = *) nogil
 
 cdef dtype[:, :] add_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = *) nogil
 cdef dtype[:, :] subtract_mm(dtype[:, :] x, dtype[:, :] y, dtype[:, :] out = *) nogil

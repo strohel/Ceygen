@@ -10,6 +10,9 @@ recent versions and changes are mentioned on top.
 Changes in 0.3 since 0.2
 ========================
 
+*  :func:`~elemwise.power_vs` and :func:`~elemwise.power_ms` functions were added to the
+   :mod:`~ceygen.reductions` module.
+
 Changes in 0.2 since 0.1
 ========================
 

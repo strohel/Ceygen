@@ -54,6 +54,28 @@ cdef dtype[:] multiply_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
     return out
 
 
+cdef void power_vs_worker(
+        dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XVectorContiguity x_dummy,
+        dtype *o_data, Py_ssize_t *o_shape, Py_ssize_t *o_strides, OVectorContiguity o_dummy,
+        dtype *y) nogil:
+    cdef Array1DMap[dtype, XVectorContiguity] x
+    cdef Array1DMap[dtype, OVectorContiguity] o
+    x.init(x_data, x_shape, x_strides)
+    o.init(o_data, o_shape, o_strides)
+    o.assign(x.pow(y[0]))
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype[:] power_vs(dtype[:] x, dtype y, dtype[:] out = None) nogil:
+    cdef VVSDispatcher[dtype] dispatcher
+    if out is None:
+        out = vector(x.shape[0], &y)
+    # y, out is swapped here so that we can share VVSDispatcher
+    dispatcher.run(&x[0], x.shape, x.strides, &out[0], out.shape, out.strides, &y,
+            power_vs_worker, power_vs_worker, power_vs_worker, power_vs_worker)
+    return out
+
+
 cdef void add_vv_worker(
         dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XVectorContiguity x_dummy,
         dtype *y_data, Py_ssize_t *y_shape, Py_ssize_t *y_strides, YVectorContiguity y_dummy,
@@ -195,6 +217,30 @@ cdef dtype[:, :] multiply_ms(dtype[:, :] x, dtype y, dtype[:, :] out = None) nog
             multiply_ms_worker, multiply_ms_worker, multiply_ms_worker,
             multiply_ms_worker, multiply_ms_worker, multiply_ms_worker,
             multiply_ms_worker, multiply_ms_worker, multiply_ms_worker)
+    return out
+
+
+cdef void power_ms_worker(
+        dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XMatrixContiguity x_dummy,
+        dtype *o_data, Py_ssize_t *o_shape, Py_ssize_t *o_strides, OMatrixContiguity o_dummy,
+        dtype *y) nogil:
+    cdef Array2DMap[dtype, XMatrixContiguity] x
+    cdef Array2DMap[dtype, OMatrixContiguity] o
+    x.init(x_data, x_shape, x_strides)
+    o.init(o_data, o_shape, o_strides)
+    o.assign(x.pow(y[0]))
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef dtype[:, :] power_ms(dtype[:, :] x, dtype y, dtype[:, :] out = None) nogil:
+    cdef MMSDispatcher[dtype] dispatcher
+    if out is None:
+        out = matrix(x.shape[0], x.shape[1], &y)
+    # we swap out and y so tat we can reuse MMSDispatcher
+    dispatcher.run(&x[0, 0], x.shape, x.strides, &out[0, 0], out.shape, out.strides, &y,
+            power_ms_worker, power_ms_worker, power_ms_worker,
+            power_ms_worker, power_ms_worker, power_ms_worker,
+            power_ms_worker, power_ms_worker, power_ms_worker)
     return out
 
 
