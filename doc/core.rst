@@ -12,7 +12,13 @@ Core Data Types
 
 .. data:: dtype
 
-   Cython `fused type`_, currently just a C double (Python :obj:`float`).
+   Cython `fused type`_, a selection of C char, short, int, long, float and double
+   (Python :obj:`float`).
+
+.. data:: nonint_dtype
+
+   Cython `fused type`_ for methods that cannot work with integer types (such as
+   :func:`~ceygen.lu.inv`).
 
 .. function:: vector(size, like)
 

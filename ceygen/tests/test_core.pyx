@@ -23,7 +23,7 @@ class TestCore(NoMallocTestCase):
     def test_dot_vv(self):
         x_np = np.array([1., 2., 3.])
         y_np = np.array([4., 5., 6.])
-        self.assertAlmostEqual(c.dot_vv(x_np, y_np), 32.)
+        self.assertAlmostEqual(c.dot_vv[double](x_np, y_np), 32.)
         cdef double[:] x = x_np
         cdef double[:] y = y_np
         self.assertAlmostEqual(c.dot_vv(x, y), 32.)
@@ -33,15 +33,15 @@ class TestCore(NoMallocTestCase):
         e1 = np.array([1., 0.])
         e2 = np.array([0., 1.])
 
-        self.assertAlmostEqual(c.dot_vv(x[0, :], e1), 1.)
-        self.assertAlmostEqual(c.dot_vv(x[0, :], e2), 2.)
-        self.assertAlmostEqual(c.dot_vv(x[1, :], e1), 3.)
-        self.assertAlmostEqual(c.dot_vv(x[1, :], e2), 4.)
+        self.assertAlmostEqual(c.dot_vv[double](x[0, :], e1), 1.)
+        self.assertAlmostEqual(c.dot_vv[double](x[0, :], e2), 2.)
+        self.assertAlmostEqual(c.dot_vv[double](x[1, :], e1), 3.)
+        self.assertAlmostEqual(c.dot_vv[double](x[1, :], e2), 4.)
 
-        self.assertAlmostEqual(c.dot_vv(x[:, 0], e1), 1.)
-        self.assertAlmostEqual(c.dot_vv(x[:, 0], e2), 3.)
-        self.assertAlmostEqual(c.dot_vv(x[:, 1], e1), 2.)
-        self.assertAlmostEqual(c.dot_vv(x[:, 1], e2), 4.)
+        self.assertAlmostEqual(c.dot_vv[double](x[:, 0], e1), 1.)
+        self.assertAlmostEqual(c.dot_vv[double](x[:, 0], e2), 3.)
+        self.assertAlmostEqual(c.dot_vv[double](x[:, 1], e1), 2.)
+        self.assertAlmostEqual(c.dot_vv[double](x[:, 1], e2), 4.)
 
     def test_dot_vv_baddims(self):
         x = np.array([1., 2., 3.])
@@ -49,7 +49,7 @@ class TestCore(NoMallocTestCase):
         z = np.array([[1., 2.], [3., 4.]])
         def dot_vv(x, y):
             # wrap up because c.dot_vv is cython-only (not callable from Python)
-            return c.dot_vv(x, y)
+            return c.dot_vv[double](x, y)
 
         self.assertRaises(ValueError, dot_vv, x, y)
         self.assertRaises(ValueError, dot_vv, x, z)
@@ -57,7 +57,7 @@ class TestCore(NoMallocTestCase):
     def test_dot_vv_none(self):
         x = np.array([1., 2., 3.])
         def dot_vv(x, y):
-            return c.dot_vv(x, y)
+            return c.dot_vv[double](x, y)
         self.assertRaises(ValueError, dot_vv, x, None)
         self.assertRaises(TypeError, dot_vv, x, [1., 2., 3.])
         self.assertRaises(ValueError, dot_vv, None, x)
@@ -67,10 +67,10 @@ class TestCore(NoMallocTestCase):
     def test_dot_mv(self):
         x_np = np.array([[1., 2., 3.], [3., 2., 1.]])
         y_np = np.array([4., 5., 6.])
-        self.assertApproxEqual(c.dot_mv(x_np, y_np), np.array([32., 28.]))
-        self.assertApproxEqual(c.dot_mv(x_np, y_np, None), np.array([32., 28.]))
+        self.assertApproxEqual(c.dot_mv[double](x_np, y_np), np.array([32., 28.]))
+        self.assertApproxEqual(c.dot_mv[double](x_np, y_np, None), np.array([32., 28.]))
         out_np = np.zeros(2)
-        out2_np = c.dot_mv(x_np, y_np, out_np)
+        out2_np = c.dot_mv[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, np.array([32., 28.]))  # test that it actually uses out
         self.assertApproxEqual(out2_np, np.array([32., 28.]))
 
@@ -78,38 +78,38 @@ class TestCore(NoMallocTestCase):
         cdef double[:] y = y_np
         self.assertApproxEqual(c.dot_mv(x, y), np.array([32., 28.]))
         cdef double[:] out = out_np
-        cdef double[:] out2 = c.dot_mv(x_np, y_np, out)
+        cdef double[:] out2 = c.dot_mv(x, y, out)
         self.assertApproxEqual(out, np.array([32., 28.]))  # test that it actually uses out
         self.assertApproxEqual(out2, np.array([32., 28.]))
 
     def test_dot_mv_transposed(self):
         x_np = np.array([[1., 2., 3.], [3., 2., 1.]])
         y_np = np.array([4., 5.])
-        self.assertApproxEqual(c.dot_mv(x_np.T, y_np), np.array([19., 18., 17.]))
+        self.assertApproxEqual(c.dot_mv[double](x_np.T, y_np), np.array([19., 18., 17.]))
 
     def test_dot_mv_strides(self):
         big = np.array([[[1., 2.], [3., 4.]],
                         [[5., 6.], [7., 8.]]])
         e1 = np.array([1., 0.])
         e2 = np.array([0., 1.])
-        self.assertApproxEqual(c.dot_mv(big[0, :, :], e1), np.array([1., 3.]))
-        self.assertApproxEqual(c.dot_mv(big[0, :, :], e2), np.array([2., 4.]))
-        self.assertApproxEqual(c.dot_mv(big[1, :, :], e1), np.array([5., 7.]))
-        self.assertApproxEqual(c.dot_mv(big[1, :, :], e2), np.array([6., 8.]))
+        self.assertApproxEqual(c.dot_mv[double](big[0, :, :], e1), np.array([1., 3.]))
+        self.assertApproxEqual(c.dot_mv[double](big[0, :, :], e2), np.array([2., 4.]))
+        self.assertApproxEqual(c.dot_mv[double](big[1, :, :], e1), np.array([5., 7.]))
+        self.assertApproxEqual(c.dot_mv[double](big[1, :, :], e2), np.array([6., 8.]))
 
-        self.assertApproxEqual(c.dot_mv(big[:, 0, :], e1), np.array([1., 5.]))
-        self.assertApproxEqual(c.dot_mv(big[:, 0, :], e2), np.array([2., 6.]))
-        self.assertApproxEqual(c.dot_mv(big[:, 1, :], e1), np.array([3., 7.]))
-        self.assertApproxEqual(c.dot_mv(big[:, 1, :], e2), np.array([4., 8.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, 0, :], e1), np.array([1., 5.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, 0, :], e2), np.array([2., 6.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, 1, :], e1), np.array([3., 7.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, 1, :], e2), np.array([4., 8.]))
 
-        self.assertApproxEqual(c.dot_mv(big[:, :, 0], e1), np.array([1., 5.]))
-        self.assertApproxEqual(c.dot_mv(big[:, :, 0], e2), np.array([3., 7.]))
-        self.assertApproxEqual(c.dot_mv(big[:, :, 1], e1), np.array([2., 6.]))
-        self.assertApproxEqual(c.dot_mv(big[:, :, 1], e2), np.array([4., 8.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, :, 0], e1), np.array([1., 5.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, :, 0], e2), np.array([3., 7.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, :, 1], e1), np.array([2., 6.]))
+        self.assertApproxEqual(c.dot_mv[double](big[:, :, 1], e2), np.array([4., 8.]))
 
     def test_dot_mv_baddims(self):
         def dot_mv(x, y, out=None):
-            return c.dot_mv(x, y, out)
+            return c.dot_mv[double](x, y, out)
         X = np.array([[1., 2., 3.],[2., 3., 4.]])
         y = np.array([1., 2., 3.])
         self.assertRaises(ValueError, dot_mv, np.array([1., 2.]), np.array([1., 2.]))
@@ -129,7 +129,7 @@ class TestCore(NoMallocTestCase):
                     if X is x and Y is y:
                         continue  # this case would be valid
                     try:
-                        c.dot_mv(X, Y, out)
+                        c.dot_mv[double](X, Y, out)
                     except ValueError:
                         pass
                     else:
@@ -140,10 +140,10 @@ class TestCore(NoMallocTestCase):
         x_np = np.array([4., 5.])
         y_np = np.array([[1., 2., 3.], [3., 2., 1.]])
         expected = np.array([19., 18., 17.])
-        self.assertApproxEqual(c.dot_vm(x_np, y_np), expected)
-        self.assertApproxEqual(c.dot_vm(x_np, y_np, None), expected)
+        self.assertApproxEqual(c.dot_vm[double](x_np, y_np), expected)
+        self.assertApproxEqual(c.dot_vm[double](x_np, y_np, None), expected)
         out_np = np.zeros(3)
-        out2_np = c.dot_vm(x_np, y_np, out_np)
+        out2_np = c.dot_vm[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected)  # test that it actually uses out
         self.assertApproxEqual(out2_np, expected)
 
@@ -151,18 +151,18 @@ class TestCore(NoMallocTestCase):
         cdef double[:, :] y = y_np
         self.assertApproxEqual(c.dot_vm(x, y), expected)
         cdef double[:] out = out_np
-        cdef double[:] out2 = c.dot_vm(x_np, y_np, out)
+        cdef double[:] out2 = c.dot_vm(x, y, out)
         self.assertApproxEqual(out, expected)  # test that it actually uses out
         self.assertApproxEqual(out2, expected)
 
     def test_dot_vm_transposed(self):
         x_np = np.array([4., 5., 6.])
         y_np = np.array([[1., 2., 3.], [3., 2., 1.]])
-        self.assertApproxEqual(c.dot_vm(x_np, y_np.T), np.array([32., 28.]))
+        self.assertApproxEqual(c.dot_vm[double](x_np, y_np.T), np.array([32., 28.]))
 
     def test_dot_vm_baddims(self):
         def dot_vm(x, y, out=None):
-            return c.dot_vm(x, y, out)
+            return c.dot_vm[double](x, y, out)
         x = np.array([1., 2.])
         y = np.array([[1., 2., 3.],[2., 3., 4.]])
         self.assertRaises(ValueError, dot_vm, np.array([1., 2.]), np.array([1., 2.]))
@@ -183,7 +183,7 @@ class TestCore(NoMallocTestCase):
                     if X is x and Y is y:
                         continue  # this case would be valid
                     try:
-                        c.dot_vm(X, Y, out)
+                        c.dot_vm[double](X, Y, out)
                     except ValueError:
                         pass
                     else:
@@ -202,10 +202,10 @@ class TestCore(NoMallocTestCase):
             np.array([[23., 31.], [34., 46.]])
         ]
 
-        self.assertApproxEqual(c.dot_mm(x_np, y_np), expected[0])
-        self.assertApproxEqual(c.dot_mm(x_np.T, y_np), expected[1])
-        self.assertApproxEqual(c.dot_mm(x_np, y_np.T), expected[2])
-        self.assertApproxEqual(c.dot_mm(x_np.T, y_np.T), expected[3])
+        self.assertApproxEqual(c.dot_mm[double](x_np, y_np), expected[0])
+        self.assertApproxEqual(c.dot_mm[double](x_np.T, y_np), expected[1])
+        self.assertApproxEqual(c.dot_mm[double](x_np, y_np.T), expected[2])
+        self.assertApproxEqual(c.dot_mm[double](x_np.T, y_np.T), expected[3])
 
         cdef double[:, :] x = x_np
         cdef double[:, :] y = y_np
@@ -224,8 +224,8 @@ class TestCore(NoMallocTestCase):
 
         a_np = np.array([[1., 2., 3.], [4., 5., 6.]])
         b_np = np.array([[1.], [2.], [3.]])
-        self.assertApproxEqual(c.dot_mm(a_np, b_np), np.array([[14.], [32.]]))
-        self.assertApproxEqual(c.dot_mm(b_np.T, a_np.T), np.array([[14., 32.]]))
+        self.assertApproxEqual(c.dot_mm[double](a_np, b_np), np.array([[14.], [32.]]))
+        self.assertApproxEqual(c.dot_mm[double](b_np.T, a_np.T), np.array([[14., 32.]]))
         cdef double[:, :] a = a_np
         cdef double[:, :] b = b_np
         self.assertApproxEqual(c.dot_mm(a, b), np.array([[14.], [32.]]))
@@ -237,32 +237,32 @@ class TestCore(NoMallocTestCase):
         eye = np.eye(2)
 
         # following are still C-contiguous:
-        self.assertApproxEqual(c.dot_mm(big[0, :, :], eye), big[0, :, :])
-        self.assertApproxEqual(c.dot_mm(big[1, :, :], eye), big[1, :, :])
-        self.assertApproxEqual(c.dot_mm(big[:, 0, :], eye), big[:, 0, :])
-        self.assertApproxEqual(c.dot_mm(big[:, 1, :], eye), big[:, 1, :])
+        self.assertApproxEqual(c.dot_mm[double](big[0, :, :], eye), big[0, :, :])
+        self.assertApproxEqual(c.dot_mm[double](big[1, :, :], eye), big[1, :, :])
+        self.assertApproxEqual(c.dot_mm[double](big[:, 0, :], eye), big[:, 0, :])
+        self.assertApproxEqual(c.dot_mm[double](big[:, 1, :], eye), big[:, 1, :])
 
         # following are Fortran-contiguous:
-        self.assertApproxEqual(c.dot_mm(big[0, :, :].T, eye), big[0, :, :].T)
-        self.assertApproxEqual(c.dot_mm(big[1, :, :].T, eye), big[1, :, :].T)
-        self.assertApproxEqual(c.dot_mm(big[:, 0, :].T, eye), big[:, 0, :].T)
-        self.assertApproxEqual(c.dot_mm(big[:, 1, :].T, eye), big[:, 1, :].T)
+        self.assertApproxEqual(c.dot_mm[double](big[0, :, :].T, eye), big[0, :, :].T)
+        self.assertApproxEqual(c.dot_mm[double](big[1, :, :].T, eye), big[1, :, :].T)
+        self.assertApproxEqual(c.dot_mm[double](big[:, 0, :].T, eye), big[:, 0, :].T)
+        self.assertApproxEqual(c.dot_mm[double](big[:, 1, :].T, eye), big[:, 1, :].T)
 
         # actually test that our infractructure is capable of detecting memory allocations
         for myslice in (big[:, :, 0], big[:, :, 1], big[:, :, 1].T, big[:, :, 1].T):
             with self.assertRaises(ValueError):
-                c.dot_mm(myslice, eye)
+                c.dot_mm[double](myslice, eye)
 
         # non-contiguous slices in dot_mm cause memory allocations in Eigen, expect it:
         with malloc_allowed():
-            self.assertApproxEqual(c.dot_mm(big[:, :, 0], eye), big[:, :, 0])
-            self.assertApproxEqual(c.dot_mm(big[:, :, 1], eye), big[:, :, 1])
-            self.assertApproxEqual(c.dot_mm(big[:, :, 0].T, eye), big[:, :, 0].T)
-            self.assertApproxEqual(c.dot_mm(big[:, :, 1].T, eye), big[:, :, 1].T)
+            self.assertApproxEqual(c.dot_mm[double](big[:, :, 0], eye), big[:, :, 0])
+            self.assertApproxEqual(c.dot_mm[double](big[:, :, 1], eye), big[:, :, 1])
+            self.assertApproxEqual(c.dot_mm[double](big[:, :, 0].T, eye), big[:, :, 0].T)
+            self.assertApproxEqual(c.dot_mm[double](big[:, :, 1].T, eye), big[:, :, 1].T)
 
         # assert that we've reenabled assertions on memory allocations
         with self.assertRaises(ValueError):
-            c.dot_mm(big[:, :, 0], eye)
+            c.dot_mm[double](big[:, :, 0], eye)
 
     def test_dot_mm_baddims(self):
         x = np.array([[1., 2.],
@@ -276,7 +276,7 @@ class TestCore(NoMallocTestCase):
                     if X is x and Y is y and (OUT is out or OUT is None):
                         continue  # these would be valid
                     try:
-                        c.dot_mm(X, Y, OUT)
+                        c.dot_mm[double](X, Y, OUT)
                     except ValueError:
                         pass
                     else:
@@ -294,7 +294,7 @@ class TestCore(NoMallocTestCase):
                     if X is x and Y in y:
                         continue  # this would be valid
                     try:
-                        c.dot_mm(X, Y, OUT)
+                        c.dot_mm[double](X, Y, OUT)
                     except ValueError:
                         pass
                     else:

@@ -16,9 +16,9 @@ class TestElemwise(NoMallocTestCase):
         y_np = -4.
         expected = np.array([-3., -1., 1.])
 
-        self.assertApproxEqual(e.add_vs(x_np, y_np), expected)
+        self.assertApproxEqual(e.add_vs[double](x_np, y_np), expected)
         out_np = np.empty(3)
-        out2 = e.add_vs(x_np, y_np, out_np)
+        out2 = e.add_vs[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected)  # test that it actually uses out
         self.assertApproxEqual(out2, expected)
 
@@ -39,14 +39,14 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, np.array([1., 2.])):
             for OUT in (out, np.empty(1), np.empty(4)):
                 if X is x and OUT is out:
-                    e.add_vs(X, y, OUT)  # this should be valid
+                    e.add_vs[double](X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.add_vs(X, y, OUT)
+                    e.add_vs[double](X, y, OUT)
 
     def test_add_vs_none(self):
         with self.assertRaises(ValueError):
-            e.add_vs(None, 3.)
+            e.add_vs[double](None, 3.)
 
 
     def test_multiply_vs(self):
@@ -54,9 +54,9 @@ class TestElemwise(NoMallocTestCase):
         y_np = -4.
         expected = np.array([-4., -12., 20.])
 
-        self.assertApproxEqual(e.multiply_vs(x_np, y_np), expected)
+        self.assertApproxEqual(e.multiply_vs[double](x_np, y_np), expected)
         out_np = np.empty(3)
-        out2 = e.multiply_vs(x_np, y_np, out_np)
+        out2 = e.multiply_vs[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected)  # test that it actually uses out
         self.assertApproxEqual(out2, expected)
 
@@ -77,14 +77,14 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, np.array([1., 2.])):
             for OUT in (out, np.empty(1), np.empty(4)):
                 if X is x and OUT is out:
-                    e.multiply_vs(X, y, OUT)  # this should be valid
+                    e.multiply_vs[double](X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.multiply_vs(X, y, OUT)
+                    e.multiply_vs[double](X, y, OUT)
 
     def test_multiply_vs_none(self):
         with self.assertRaises(ValueError):
-            e.multiply_vs(None, 3.)
+            e.multiply_vs[double](None, 3.)
 
 
     def test_power_vs(self):
@@ -92,9 +92,9 @@ class TestElemwise(NoMallocTestCase):
         y_np = 2.
         expected = np.array([1., 9., 25.])
 
-        self.assertApproxEqual(e.power_vs(x_np, y_np), expected)
+        self.assertApproxEqual(e.power_vs[double](x_np, y_np), expected)
         out_np = np.empty(3)
-        out2 = e.power_vs(x_np, y_np, out_np)
+        out2 = e.power_vs[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected)  # test that it actually uses out
         self.assertApproxEqual(out2, expected)
 
@@ -115,14 +115,14 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, np.array([1., 2.])):
             for OUT in (out, np.empty(1), np.empty(4)):
                 if X is x and OUT is out:
-                    e.power_vs(X, y, OUT)  # this should be valid
+                    e.power_vs[double](X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.power_vs(X, y, OUT)
+                    e.power_vs[double](X, y, OUT)
 
     def test_power_vs_none(self):
         with self.assertRaises(ValueError):
-            e.power_vs(None, 3.)
+            e.power_vs[double](None, 3.)
 
 
     def test_add_vv(self):
@@ -130,10 +130,10 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([3., 2., 1.])
         expected_xy, expected_yx = np.array([4., 5., 6.]), np.array([4., 5., 6.])
 
-        self.assertApproxEqual(e.add_vv(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.add_vv(y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.add_vv[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.add_vv[double](y_np, x_np), expected_yx)
         out_np = np.empty(3)
-        out2 = e.add_vv(x_np, y_np, out_np)
+        out2 = e.add_vv[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -155,10 +155,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([1., 2., 3., 4.])):
                 for OUT in (out, np.empty(2), np.empty(4)):
                     if X is x and Y is y and OUT is out:
-                        e.add_vv(X, Y, OUT)  # this should be valid
+                        e.add_vv[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.add_vv(X, Y, OUT)
+                        e.add_vv[double](X, Y, OUT)
 
     def test_add_vv_none(self):
         x = np.array([1., 2., 3.])
@@ -167,10 +167,10 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.add_vv(X, Y)  # this should be valid
+                    e.add_vv[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.add_vv(X, Y)
+                    e.add_vv[double](X, Y)
 
 
     def test_subtract_vv(self):
@@ -178,10 +178,10 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([3., 2., 1.])
         expected_xy, expected_yx = np.array([-2., 0., 2.]), np.array([2., 0., -2.])
 
-        self.assertApproxEqual(e.subtract_vv(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.subtract_vv(y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.subtract_vv[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.subtract_vv[double](y_np, x_np), expected_yx)
         out_np = np.empty(3)
-        out2 = e.subtract_vv(x_np, y_np, out_np)
+        out2 = e.subtract_vv[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -203,10 +203,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([1., 2., 3., 4.])):
                 for OUT in (out, np.empty(2), np.empty(4)):
                     if X is x and Y is y and OUT is out:
-                        e.subtract_vv(X, Y, OUT)  # this should be valid
+                        e.subtract_vv[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.subtract_vv(X, Y, OUT)
+                        e.subtract_vv[double](X, Y, OUT)
 
     def test_subtract_vv_none(self):
         x = np.array([1., 2., 3.])
@@ -215,10 +215,10 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.subtract_vv(X, Y)  # this should be valid
+                    e.subtract_vv[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.subtract_vv(X, Y)
+                    e.subtract_vv[double](X, Y)
 
 
     def test_multiply_vv(self):
@@ -226,10 +226,10 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([3., 2., 1.])
         expected_xy, expected_yx = np.array([3., 4., 3.]), np.array([3., 4., 3.])
 
-        self.assertApproxEqual(e.multiply_vv(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.multiply_vv(y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.multiply_vv[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.multiply_vv[double](y_np, x_np), expected_yx)
         out_np = np.empty(3)
-        out2 = e.multiply_vv(x_np, y_np, out_np)
+        out2 = e.multiply_vv[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -251,10 +251,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([1., 2., 3., 4.])):
                 for OUT in (out, np.empty(2), np.empty(4)):
                     if X is x and Y is y and OUT is out:
-                        e.multiply_vv(X, Y, OUT)  # this should be valid
+                        e.multiply_vv[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.multiply_vv(X, Y, OUT)
+                        e.multiply_vv[double](X, Y, OUT)
 
     def test_multiply_vv_none(self):
         x = np.array([1., 2., 3.])
@@ -263,10 +263,10 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.multiply_vv(X, Y)  # this should be valid
+                    e.multiply_vv[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.multiply_vv(X, Y)
+                    e.multiply_vv[double](X, Y)
 
 
     def test_divide_vv(self):
@@ -274,10 +274,10 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([3., 2., 1.])
         expected_xy, expected_yx = np.array([1./3., 1., 3.]), np.array([3., 1., 1./3.])
 
-        self.assertApproxEqual(e.divide_vv(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.divide_vv(y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.divide_vv[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.divide_vv[double](y_np, x_np), expected_yx)
         out_np = np.empty(3)
-        out2 = e.divide_vv(x_np, y_np, out_np)
+        out2 = e.divide_vv[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -299,10 +299,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([1., 2., 3., 4.])):
                 for OUT in (out, np.empty(2), np.empty(4)):
                     if X is x and Y is y and OUT is out:
-                        e.divide_vv(X, Y, OUT)  # this should be valid
+                        e.divide_vv[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.divide_vv(X, Y, OUT)
+                        e.divide_vv[double](X, Y, OUT)
 
     def test_divide_vv_none(self):
         x = np.array([1., 2., 3.])
@@ -311,10 +311,10 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.divide_vv(X, Y)  # this should be valid
+                    e.divide_vv[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.divide_vv(X, Y)
+                    e.divide_vv[double](X, Y)
 
 
     def test_add_ms(self):
@@ -322,10 +322,10 @@ class TestElemwise(NoMallocTestCase):
         y_np = -4.
         expected = np.array([[-3., -1., 1.]])
 
-        self.assertApproxEqual(e.add_ms(x_np, y_np), expected)
-        self.assertApproxEqual(e.add_ms(x_np.T, y_np), expected.T)
+        self.assertApproxEqual(e.add_ms[double](x_np, y_np), expected)
+        self.assertApproxEqual(e.add_ms[double](x_np.T, y_np), expected.T)
         out_np = np.empty((1, 3))
-        out2 = e.add_ms(x_np, y_np, out_np)
+        out2 = e.add_ms[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected)  # test that it actually uses out
         self.assertApproxEqual(out2, expected)
 
@@ -346,14 +346,14 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, np.array([[1., 2.]]), np.array([1., 2.])):
             for OUT in (out, np.empty((1, 1)), np.empty((1, 4)), np.empty(3)):
                 if X is x and OUT is out:
-                    e.add_ms(X, y, OUT)  # this should be valid
+                    e.add_ms[double](X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.add_ms(X, y, OUT)
+                    e.add_ms[double](X, y, OUT)
 
     def test_add_ms_none(self):
         with self.assertRaises(ValueError):
-            e.add_ms(None, 3.)
+            e.add_ms[double](None, 3.)
 
 
     def test_multiply_ms(self):
@@ -361,10 +361,10 @@ class TestElemwise(NoMallocTestCase):
         y_np = -4.
         expected = np.array([[-4., -12., 20.]])
 
-        self.assertApproxEqual(e.multiply_ms(x_np, y_np), expected)
-        self.assertApproxEqual(e.multiply_ms(x_np.T, y_np), expected.T)
+        self.assertApproxEqual(e.multiply_ms[double](x_np, y_np), expected)
+        self.assertApproxEqual(e.multiply_ms[double](x_np.T, y_np), expected.T)
         out_np = np.empty((1, 3))
-        out2 = e.multiply_ms(x_np, y_np, out_np)
+        out2 = e.multiply_ms[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected)  # test that it actually uses out
         self.assertApproxEqual(out2, expected)
 
@@ -385,14 +385,14 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, np.array([[1., 2.]]), np.array([1., 2.])):
             for OUT in (out, np.empty((1, 1)), np.empty((1, 4)), np.empty(3)):
                 if X is x and OUT is out:
-                    e.multiply_ms(X, y, OUT)  # this should be valid
+                    e.multiply_ms[double](X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.multiply_ms(X, y, OUT)
+                    e.multiply_ms[double](X, y, OUT)
 
     def test_multiply_ms_none(self):
         with self.assertRaises(ValueError):
-            e.multiply_ms(None, 3.)
+            e.multiply_ms[double](None, 3.)
 
 
     def test_power_ms(self):
@@ -400,10 +400,10 @@ class TestElemwise(NoMallocTestCase):
         y_np = 2.
         expected = np.array([[1., 9., 25.]])
 
-        self.assertApproxEqual(e.power_ms(x_np, y_np), expected)
-        self.assertApproxEqual(e.power_ms(x_np.T, y_np), expected.T)
+        self.assertApproxEqual(e.power_ms[double](x_np, y_np), expected)
+        self.assertApproxEqual(e.power_ms[double](x_np.T, y_np), expected.T)
         out_np = np.empty((1, 3))
-        out2 = e.power_ms(x_np, y_np, out_np)
+        out2 = e.power_ms[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected)  # test that it actually uses out
         self.assertApproxEqual(out2, expected)
 
@@ -424,14 +424,14 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, np.array([[1., 2.]]), np.array([1., 2.])):
             for OUT in (out, np.empty((1, 1)), np.empty((1, 4)), np.empty(3)):
                 if X is x and OUT is out:
-                    e.power_ms(X, y, OUT)  # this should be valid
+                    e.power_ms[double](X, y, OUT)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.power_ms(X, y, OUT)
+                    e.power_ms[double](X, y, OUT)
 
     def test_power_ms_none(self):
         with self.assertRaises(ValueError):
-            e.power_ms(None, 3.)
+            e.power_ms[double](None, 3.)
 
 
     def test_add_mm(self):
@@ -439,12 +439,12 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([[3., 2., 1.]])
         expected_xy, expected_yx = np.array([[4., 5., 6.]]), np.array([[4., 5., 6.]])
 
-        self.assertApproxEqual(e.add_mm(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.add_mm(y_np, x_np), expected_yx)
-        self.assertApproxEqual(e.add_mm(x_np.T, y_np.T), expected_xy.T)
-        self.assertApproxEqual(e.add_mm(y_np.T, x_np.T), expected_yx.T)
+        self.assertApproxEqual(e.add_mm[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.add_mm[double](y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.add_mm[double](x_np.T, y_np.T), expected_xy.T)
+        self.assertApproxEqual(e.add_mm[double](y_np.T, x_np.T), expected_yx.T)
         out_np = np.empty((1, 3))
-        out2 = e.add_mm(x_np, y_np, out_np)
+        out2 = e.add_mm[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -468,10 +468,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([[1., 2., 3., 4.]]), np.array([[1.], [2.], [3.], [4.]])):
                 for OUT in (out, np.empty((1, 2)), np.empty((3, 1)), np.empty((1, 4))):
                     if X is x and Y is y and OUT is out:
-                        e.add_mm(X, Y, OUT)  # this should be valid
+                        e.add_mm[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.add_mm(X, Y, OUT)
+                        e.add_mm[double](X, Y, OUT)
 
     def test_add_mm_none(self):
         x = np.array([[1., 2., 3.]])
@@ -480,10 +480,10 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.add_mm(X, Y)  # this should be valid
+                    e.add_mm[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.add_mm(X, Y)
+                    e.add_mm[double](X, Y)
 
 
     def test_subtract_mm(self):
@@ -491,12 +491,12 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([[3., 2., 1.]])
         expected_xy, expected_yx = np.array([[-2., 0., 2.]]), np.array([[2., 0., -2.]])
 
-        self.assertApproxEqual(e.subtract_mm(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.subtract_mm(y_np, x_np), expected_yx)
-        self.assertApproxEqual(e.subtract_mm(x_np.T, y_np.T), expected_xy.T)
-        self.assertApproxEqual(e.subtract_mm(y_np.T, x_np.T), expected_yx.T)
+        self.assertApproxEqual(e.subtract_mm[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.subtract_mm[double](y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.subtract_mm[double](x_np.T, y_np.T), expected_xy.T)
+        self.assertApproxEqual(e.subtract_mm[double](y_np.T, x_np.T), expected_yx.T)
         out_np = np.empty((1, 3))
-        out2 = e.subtract_mm(x_np, y_np, out_np)
+        out2 = e.subtract_mm[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -520,10 +520,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([[1., 2., 3., 4.]]), np.array([[1.], [2.], [3.], [4.]])):
                 for OUT in (out, np.empty((1, 2)), np.empty((3, 1)), np.empty((1, 4))):
                     if X is x and Y is y and OUT is out:
-                        e.subtract_mm(X, Y, OUT)  # this should be valid
+                        e.subtract_mm[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.subtract_mm(X, Y, OUT)
+                        e.subtract_mm[double](X, Y, OUT)
 
     def test_subtract_mm_none(self):
         x = np.array([[1., 2., 3.]])
@@ -532,10 +532,10 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.subtract_mm(X, Y)  # this should be valid
+                    e.subtract_mm[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.subtract_mm(X, Y)
+                    e.subtract_mm[double](X, Y)
 
 
     def test_multiply_mm(self):
@@ -543,12 +543,12 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([[3., 2., 1.]])
         expected_xy, expected_yx = np.array([[3., 4., 3.]]), np.array([[3., 4., 3.]])
 
-        self.assertApproxEqual(e.multiply_mm(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.multiply_mm(y_np, x_np), expected_yx)
-        self.assertApproxEqual(e.multiply_mm(x_np.T, y_np.T), expected_xy.T)
-        self.assertApproxEqual(e.multiply_mm(y_np.T, x_np.T), expected_yx.T)
+        self.assertApproxEqual(e.multiply_mm[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.multiply_mm[double](y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.multiply_mm[double](x_np.T, y_np.T), expected_xy.T)
+        self.assertApproxEqual(e.multiply_mm[double](y_np.T, x_np.T), expected_yx.T)
         out_np = np.empty((1, 3))
-        out2 = e.multiply_mm(x_np, y_np, out_np)
+        out2 = e.multiply_mm[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -572,10 +572,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([[1., 2., 3., 4.]]), np.array([[1.], [2.], [3.], [4.]])):
                 for OUT in (out, np.empty((1, 2)), np.empty((3, 1)), np.empty((1, 4))):
                     if X is x and Y is y and OUT is out:
-                        e.multiply_mm(X, Y, OUT)  # this should be valid
+                        e.multiply_mm[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.multiply_mm(X, Y, OUT)
+                        e.multiply_mm[double](X, Y, OUT)
 
     def test_multiply_mm_none(self):
         x = np.array([[1., 2., 3.]])
@@ -584,10 +584,10 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.multiply_mm(X, Y)  # this should be valid
+                    e.multiply_mm[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.multiply_mm(X, Y)
+                    e.multiply_mm[double](X, Y)
 
 
     def test_divide_mm(self):
@@ -595,12 +595,12 @@ class TestElemwise(NoMallocTestCase):
         y_np = np.array([[3., 2., 1.]])
         expected_xy, expected_yx = np.array([[1./3., 1., 3.]]), np.array([[3., 1., 1./3.]])
 
-        self.assertApproxEqual(e.divide_mm(x_np, y_np), expected_xy)
-        self.assertApproxEqual(e.divide_mm(y_np, x_np), expected_yx)
-        self.assertApproxEqual(e.divide_mm(x_np.T, y_np.T), expected_xy.T)
-        self.assertApproxEqual(e.divide_mm(y_np.T, x_np.T), expected_yx.T)
+        self.assertApproxEqual(e.divide_mm[double](x_np, y_np), expected_xy)
+        self.assertApproxEqual(e.divide_mm[double](y_np, x_np), expected_yx)
+        self.assertApproxEqual(e.divide_mm[double](x_np.T, y_np.T), expected_xy.T)
+        self.assertApproxEqual(e.divide_mm[double](y_np.T, x_np.T), expected_yx.T)
         out_np = np.empty((1, 3))
-        out2 = e.divide_mm(x_np, y_np, out_np)
+        out2 = e.divide_mm[double](x_np, y_np, out_np)
         self.assertApproxEqual(out_np, expected_xy)  # test that it actually uses out
         self.assertApproxEqual(out2, expected_xy)
 
@@ -624,10 +624,10 @@ class TestElemwise(NoMallocTestCase):
             for Y in (y, np.array([[1., 2., 3., 4.]]), np.array([[1.], [2.], [3.], [4.]])):
                 for OUT in (out, np.empty((1, 2)), np.empty((3, 1)), np.empty((1, 4))):
                     if X is x and Y is y and OUT is out:
-                        e.divide_mm(X, Y, OUT)  # this should be valid
+                        e.divide_mm[double](X, Y, OUT)  # this should be valid
                         continue
                     with self.assertRaises(ValueError):
-                        e.divide_mm(X, Y, OUT)
+                        e.divide_mm[double](X, Y, OUT)
 
     def test_divide_mm_none(self):
         x = np.array([[1., 2., 3.]])
@@ -636,7 +636,7 @@ class TestElemwise(NoMallocTestCase):
         for X in (x, None):
             for Y in (y, None):
                 if X is x and Y is y:
-                    e.divide_mm(X, Y)  # this should be valid
+                    e.divide_mm[double](X, Y)  # this should be valid
                     continue
                 with self.assertRaises(ValueError):
-                    e.divide_mm(X, Y)
+                    e.divide_mm[double](X, Y)

@@ -10,6 +10,13 @@ recent versions and changes are mentioned on top.
 Changes in 0.3 since 0.2
 ========================
 
+*  :obj:`~dtype.dtype` enhanced to provide C char, short, int, long and float types in
+   addition to C double type. :obj:`~dtype.nonint_dtype` introduced for non-integer
+   numeric types. If you get *no suitable method found* or *Invalid use of fused types,
+   type cannot be specialized* Cython errors, specify the specialization explicitly:
+   ``ceygen.elemwise.add_vv[double](np.array(...), np.array(...))``. This unfortunately
+   slows down compilation and makes resulting modules bigger, but doesn't affect
+   performance and makes Ceygen more generic.
 *  :func:`~elemwise.power_vs` and :func:`~elemwise.power_ms` functions were added to the
    :mod:`~ceygen.reductions` module.
 

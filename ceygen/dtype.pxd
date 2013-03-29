@@ -10,7 +10,16 @@
 #  * rebuild Ceygen!
 
 ctypedef fused dtype:
-#    float
+    char
+    short
+    int
+    long
+    float
+    double
+
+# some methods such as inv() cannot really work with non-integer types
+ctypedef fused nonint_dtype:
+    float
     double
 
 cdef dtype[:] vector(int size, dtype *like) with gil
