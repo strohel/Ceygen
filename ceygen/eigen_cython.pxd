@@ -27,9 +27,11 @@ cdef extern from "eigen_cpp.h":
         # exported Eigen methods
         Scalar determinant() nogil
         Scalar dot(BaseMap) nogil
-        # a little hack so that we don't have to introduce VectorwiseOp cppclass
+        # a little hack so that we don't have to introduce VectorwiseOp cppclass:
         BaseMap colwise_sum "colwise().sum"() nogil
         BaseMap rowwise_sum "rowwise().sum"() nogil
+        # a little hack so that we don't have to introduce LLT class:
+        BaseMap llt_matrixL "llt().matrixL"() nogil
         Scalar sum() nogil
         BaseMap pow(Scalar) nogil
 

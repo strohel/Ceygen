@@ -10,6 +10,7 @@ recent versions and changes are mentioned on top.
 Changes in 0.3 since 0.2
 ========================
 
+*  :mod:`~ceygen.llt` module introduced with Cholesky matrix decomposition.
 *  :obj:`~dtype.dtype` enhanced to provide C char, short, int, long and float types in
    addition to C double type. :obj:`~dtype.nonint_dtype` introduced for non-integer
    numeric types. If you get *no suitable method found* or *Invalid use of fused types,

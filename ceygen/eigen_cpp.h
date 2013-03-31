@@ -17,6 +17,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/LU> // for Matrix.inverse()
+#include <Eigen/Cholesky> // for Matrix.llt()
 
 #include <Python.h> // for Py_ssize_t
 
