@@ -14,12 +14,12 @@ provided by the <`Eigen/Cholesky`_> include).
    *out*)
 
    :param x: matrix to decompose
-   :type x: |matrix|
+   :type x: |nonint_matrix|
    :param out: |out|
-   :type out: |matrix|
+   :type out: |nonint_matrix|
    :raises: |valueerror|
    :raises: |typeerror|
-   :rtype: |matrix|
+   :rtype: |nonint_matrix|
 
 .. _`Eigen/Cholesky`: http://eigen.tuxfamily.org/dox/QuickRefPage.html#QuickRef_Headers
 

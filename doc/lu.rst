@@ -14,12 +14,12 @@ provided by the <`Eigen/LU`_> include), most notably matrix inverse and determin
    without any warning.
 
    :param x: matrix to invert
-   :type x: |matrix|
+   :type x: |nonint_matrix|
    :param out: |out|
-   :type out: |matrix|
+   :type out: |nonint_matrix|
    :raises: |valueerror|
    :raises: |typeerror|
-   :rtype: |matrix|
+   :rtype: |nonint_matrix|
 
 .. function:: iinv(x[, out=None])
 
@@ -28,7 +28,7 @@ provided by the <`Eigen/LU`_> include), most notably matrix inverse and determin
    that *x* is invertible, otherwise you get undefined result without any warning.
 
    :param x: matrix to invert in-place
-   :type x: |matrix|
+   :type x: |nonint_matrix|
    :raises: |valueerror|
    :raises: |typeerror|
    :returns: |alwaystrue|

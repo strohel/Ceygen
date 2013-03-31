@@ -1,8 +1,11 @@
 .. Definitions to be shared by other documentation documents.
 
 .. |scalar| replace:: :obj:`~ceygen.dtype.dtype`
+.. |nonint_scalar| replace:: :obj:`~ceygen.dtype.nonint_dtype`
 .. |vector| replace:: :obj:`dtype[:] <ceygen.dtype.dtype>`
+.. |nonint_vector| replace:: :obj:`nonint_dtype[:] <ceygen.dtype.nonint_dtype>`
 .. |matrix| replace:: :obj:`dtype[:, :] <ceygen.dtype.dtype>`
+.. |nonint_matrix| replace:: :obj:`nonint_dtype[:, :] <ceygen.dtype.nonint_dtype>`
 .. |out| replace:: memory view to write the result to. Specifying this optional argument
    means that Ceygen doesn't have to allocate memory for the result (allocating memory
    involves acquiring the GIL_ and calling many expensive Python functions). Once
