@@ -42,7 +42,7 @@ class build_ext(orig_build_ext):
 
     def run(self):
         self.distribution.ext_modules = cythonize(self.distribution.ext_modules,
-                annotate=self.annotate, force=self.force)
+                annotate=self.annotate, force=self.force, build_dir=self.build_temp)
         self.extensions = self.distribution.ext_modules  # orig_build_ext caches the list
         orig_build_ext.run(self)
 
