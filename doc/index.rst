@@ -12,6 +12,7 @@ Ceygen API Documentation
    lu
    llt
    reductions
+   HACKING
 
 Indices and tables
 ==================

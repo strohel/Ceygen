@@ -74,8 +74,8 @@ On the other hand, Ceygen...
   infrastructure - implementing a new function should be rather straightforward (with
   decent Cython and C++ knowledge). We're very open to pull requests!
   (do include unit tests in them)
-* **needs recent Cython** to compile. [#cythonvers]_ If this is a problem, you can
-  distribute .cpp files or final Python extension module instead.
+* **needs recent Cython** (currently at least 0.19.1) to compile. If this is a problem,
+  you can distribute .cpp files or final Python extension module instead.
 * **doesn't bring Eigen's elegance to Cython** - if you think of lazy evaluation and
   advanced expessions, stop dreaming. Ceygen will make your code faster, not nicer.
   `Array expessions`_ will help here.
@@ -181,7 +181,3 @@ Please report any bugs you find and suggestions you may have to `Ceygen's github
 Tracker`_.
 
 .. _`Ceygen's github Issue Tracker`: https://github.com/strohel/Ceygen/issues
-
-.. rubric:: Footnotes
-
-.. [#cythonvers] currently this is at least Cython 0.18.
