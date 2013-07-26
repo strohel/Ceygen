@@ -22,11 +22,11 @@ class TestCore(NoMallocTestCase):
 
     def test_eigen_version(self):
         vers = c.eigen_version()
-        self.assertIsInstance(vers, tuple)
+        self.assertTrue(isinstance(vers, tuple))
         self.assertEqual(len(vers), 3)
-        self.assertIsInstance(vers[0], int)
-        self.assertIsInstance(vers[1], int)
-        self.assertIsInstance(vers[2], int)
+        self.assertTrue(isinstance(vers[0], int))
+        self.assertTrue(isinstance(vers[1], int))
+        self.assertTrue(isinstance(vers[2], int))
 
     def test_dot_vv(self):
         x_np = np.array([1., 2., 3.])
