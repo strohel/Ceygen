@@ -20,6 +20,14 @@ class TestCore(NoMallocTestCase):
         # TODO: the following line makes Python crash - bug in cython?
         #self.assertApproxEqual(c.dot_mm(big[:, 0:2].T, big[:, 2:4], big[:, 4:6]), [[2., -6.], [4., -8.]])
 
+    def test_eigen_version(self):
+        vers = c.eigen_version()
+        self.assertIsInstance(vers, tuple)
+        self.assertEqual(len(vers), 3)
+        self.assertIsInstance(vers[0], int)
+        self.assertIsInstance(vers[1], int)
+        self.assertIsInstance(vers[2], int)
+
     def test_dot_vv(self):
         x_np = np.array([1., 2., 3.])
         y_np = np.array([4., 5., 6.])

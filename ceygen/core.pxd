@@ -7,6 +7,7 @@ from dtype cimport dtype
 
 
 cpdef bint set_is_malloc_allowed(bint allowed) nogil
+cpdef tuple eigen_version()
 
 cdef dtype dot_vv(dtype[:] x, dtype[:] y) nogil except *
 cdef dtype[:] dot_mv(dtype[:, :] x, dtype[:] y, dtype[:] out = *) nogil

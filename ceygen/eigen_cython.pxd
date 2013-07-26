@@ -14,6 +14,7 @@ from dtype cimport dtype
 
 cdef extern from "eigen_cpp.h":
     void c_set_is_malloc_allowed "internal::set_is_malloc_allowed"(bool) nogil
+    int EIGEN_WORLD_VERSION, EIGEN_MAJOR_VERSION, EIGEN_MINOR_VERSION
 
     cdef cppclass BaseMap[Scalar]:
         # "constructor":

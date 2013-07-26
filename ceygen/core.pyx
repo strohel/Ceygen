@@ -13,6 +13,9 @@ from dtype cimport vector, matrix
 cpdef bint set_is_malloc_allowed(bint allowed) nogil:
     c_set_is_malloc_allowed(allowed)
 
+cpdef tuple eigen_version():
+    return (EIGEN_WORLD_VERSION, EIGEN_MAJOR_VERSION, EIGEN_MINOR_VERSION)
+
 
 cdef void dot_vv_worker(
         dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XVectorContiguity x_dummy,

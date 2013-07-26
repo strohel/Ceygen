@@ -129,6 +129,13 @@ Miscellaneous Functions
 
    See http://eigen.tuxfamily.org/dox/TopicPreprocessorDirectives.html
 
+.. function:: eigen_version()
+
+   Return version of Eigen which Ceygen was compiled against as a tuple of three integers,
+   for example (3, 1, 2).
+
+   :rtype: :obj:`tuple` of 3 :obj:`ints <int>`
+
 .. _`Eigen/Core`: http://eigen.tuxfamily.org/dox/QuickRefPage.html#QuickRef_Headers
 .. _`fused type`: http://docs.cython.org/src/userguide/fusedtypes.html
 
