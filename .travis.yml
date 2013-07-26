@@ -13,4 +13,4 @@ install:
   - if test ${TRAVIS_PYTHON_VERSION%%.*} = 3; then pip install numpy --use-mirrors; fi
 
 script:
-  - python setup.py -v test
+  - BENCHMARK_NUMPY=1 python setup.py -v test
