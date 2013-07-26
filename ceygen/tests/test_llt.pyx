@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from support import CeygenTestCase
+from support import CeygenTestCase, skipIfEigenOlderThan
 cimport ceygen.llt as llt
 
 
@@ -28,6 +28,7 @@ class TestLlt(CeygenTestCase):
         self.assertApproxEqual(out, expected)
         self.assertApproxEqual(out2, expected)
 
+    @skipIfEigenOlderThan(3, 1, 0)
     def test_cholesky_badinput(self):
         x = 0.5 * np.eye(2)
         out = np.zeros((2, 2))

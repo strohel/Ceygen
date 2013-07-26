@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from support import CeygenTestCase, skip
+from support import CeygenTestCase, skipIfEigenOlderThan
 cimport ceygen.lu as l
 
 
@@ -57,8 +57,8 @@ class TestLu(CeygenTestCase):
         self.assertApproxEqual(l.det[double](np.array([[1., 2.], [2., 4.]])), 0.)
         self.assertApproxEqual(l.det[double](np.array([[17.]])), 17.)
 
-    @skip('until fix from http://eigen.tuxfamily.org/bz/show_bug.cgi?id=548 is released in Eigen')
+    @skipIfEigenOlderThan(3, 1, 90)
     def test_det_badinput(self):
-        for X in(np.array([1.]), np.array([[1., 2.]]), None):
+        for X in(np.array([1.]), np.array([[1., 2.]])):
             with self.assertRaises(ValueError):
                 l.det[double](X)

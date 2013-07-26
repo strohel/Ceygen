@@ -15,7 +15,7 @@ try:
 except ImportError:
     skip = None
 
-from ceygen.core import set_is_malloc_allowed
+from ceygen.core import set_is_malloc_allowed, eigen_version
 
 
 class _AssertRaisesContext(object):
@@ -99,6 +99,9 @@ class malloc_allowed:
         return False  # let the exceptions fall through
 
 
+def _id(obj):
+        return obj
+
 if skip is None:
     def skip(reason):
         """Implementation of the @skip decorator from Python 2.7 for Python 2.6"""
@@ -111,9 +114,6 @@ if skip is None:
             return wrapper
         return decorator
 
-    def _id(obj):
-        return obj
-
     def skipIf(condition, reason):
         """Implementation of the @skipIf decorator from Python 2.7 for Python 2.6"""
         if condition:
@@ -125,6 +125,18 @@ if skip is None:
         if not condition:
             return skip(reason)
         return _id
+
+def skipIfEigenOlderThan(world, major, minor):
+    ev = eigen_version()
+    reason = 'because this test only passes with Eigen >= {0}.{1}.{2}'.format(world, major, minor)
+    reason += ', but tested Ceygen was compiled against {0}.{1}.{2}'.format(ev[0], ev[1], ev[2])
+    for (expected, actual) in zip((world, major, minor), ev):
+        if actual < expected:
+            return skip(reason)
+        if actual > expected:  # strictly greater, don't check more minor versions
+            return _id
+        # else check more minor version
+    return _id  # actual == expected
 
 def benchmark(func):
     """Decorator to mark functions as benchmarks so that they aren't run by default"""
