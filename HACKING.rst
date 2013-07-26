@@ -64,8 +64,8 @@ Tagging & Publishing
 1. Do ``./setup.py sdist`` and check contents, unpack somewhere, run tests incl.
    benchmarks
 #. git tag -s **vX.Y**
-#. ./setup.py register sdist upload
-#. Build and upload docs: ``cd ../ceygen-doc && ./synchronize.sh``
+#. ./setup.py register sdist upload --sign
+#. Build and upload docs: ``cd ../ceygen-doc && ./synchronise.sh``
 #. If **short description** changed, update it manually at following places:
 
    * https://github.com/strohel/Ceygen

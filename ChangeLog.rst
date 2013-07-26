@@ -7,6 +7,9 @@ recent versions and changes are mentioned on top.
 
 .. currentmodule:: ceygen
 
+Changes in 0.4 since 0.3
+========================
+
 Changes in 0.3 since 0.2
 ========================
 
