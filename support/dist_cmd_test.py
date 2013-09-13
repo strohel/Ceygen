@@ -3,6 +3,10 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
+"""
+A custom command for distutils to facilitate stress-testing of Ceygen
+"""
+
 from distutils.cmd import Command
 from distutils.errors import DistutilsExecError
 

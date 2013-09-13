@@ -10,6 +10,7 @@ import numpy as np
 import functools
 import os
 import unittest as ut
+# Python 2.6 compatibility
 try:
     from unittest import skip, skipIf, skipUnless
 except ImportError:
