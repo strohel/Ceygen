@@ -6,7 +6,6 @@
 from distutils.dist import Distribution
 
 from .dist_cmd_build_ext import build_ext
-from .dist_cmd_clean import clean
 from .dist_cmd_test import test
 
 
@@ -17,5 +16,4 @@ class CeygenDistribution(Distribution):
         self.ldflags = None  # Default LDFLAGS overridable by setup.cfg
         Distribution.__init__(self, attrs)
         self.cmdclass['build_ext'] = build_ext
-        self.cmdclass['clean'] = clean
         self.cmdclass['test'] = test
