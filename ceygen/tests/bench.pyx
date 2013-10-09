@@ -330,9 +330,9 @@ class Bench(CeygenTestCase):
                     for i in range(iterations):
                         lu.det(x)
 
-            pool = Pool(processes=cpu_count())  # TODO: actual number of cores
             with timeit(b"det", "numpy parallel", locals()) as context:
                 if context.execute:
+                    pool = Pool(processes=cpu_count())  # TODO: actual number of cores
                     pool.map(np_det, (x_np for i in range(iterations)))
 
             with timeit(b"det", "ceygen parallel", locals()) as context:
