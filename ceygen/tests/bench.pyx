@@ -3,10 +3,13 @@
 # Distributed under the terms of the GNU General Public License v2 or any
 # later version of the license, at your option.
 
+from cython.parallel cimport prange
+
 import numpy as np
 cdef object np_dot = np.dot
 cdef object np_add = np.add
 cdef object np_multiply = np.multiply
+cdef object np_det = np.linalg.det
 
 import os
 import pickle
@@ -26,7 +29,7 @@ class timeit:
         self.func, self.iterations, self.cost = func, args['iterations'], args['cost']
         self.stats = args['self'].stats
         self.execute = True
-        if implementation == 'numpy' and 'BENCHMARK_NUMPY' not in os.environ:
+        if implementation.startswith('numpy') and 'BENCHMARK_NUMPY' not in os.environ:
             self.execute = False
         self.implementation = implementation.rjust(args['self'].align)
 
@@ -162,7 +165,7 @@ class Bench(CeygenTestCase):
 
             with timeit(b"dot_mm", "numpy", locals()) as context:
                 if context.execute:
-                    for i in range(context.iterations):
+                    for i in range(iterations):
                         np_dot(x_np, y_np, out_np)
             with timeit(b"dot_mm", "ceygen", locals()) as context:
                 if context.execute:
@@ -303,18 +306,38 @@ class Bench(CeygenTestCase):
     @benchmark
     def test_bench_det(self):
         print
-        cdef int iterations
+        cdef int i, iterations
         cdef double[:, :] x
+        from multiprocessing import cpu_count, Pool
 
         for size in self.sizes:
             x_np = np.random.rand(size, size)
             x = x_np
 
-            cost = 2./3. * size**3.
-            iterations = min(max(0.5 * 10.**9. / cost, 1), 1000000)
+            cost = size**3.
+            iterations = 4 * min(max(int(0.25 * 10.**9. / cost), 1), 250000)
             print "size: {0}*{0}, iterations: {1}".format(size, iterations)
+            origalign = self.align
+            self.align = 17
+
+            with timeit(b"det", "numpy", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        np_det(x_np)
 
             with timeit(b"det", "ceygen", locals()) as context:
                 if context.execute:
                     for i in range(iterations):
                         lu.det(x)
+
+            pool = Pool(processes=cpu_count())  # TODO: actual number of cores
+            with timeit(b"det", "numpy parallel", locals()) as context:
+                if context.execute:
+                    pool.map(np_det, (x_np for i in range(iterations)))
+
+            with timeit(b"det", "ceygen parallel", locals()) as context:
+                if context.execute:
+                    for i in prange(iterations, nogil=True):
+                        lu.det(x)
+
+            self.align = origalign
