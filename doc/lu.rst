@@ -21,7 +21,7 @@ provided by the <`Eigen/LU`_> include), most notably matrix inverse and determin
    :raises: |typeerror|
    :rtype: |nonint_matrix|
 
-.. function:: iinv(x[, out=None])
+.. function:: iinv(x)
 
    Compte matrix inverse using LU decomposition with partial pivoting in-place. Equivalent
    to *x* = :obj:`inv(x) <inv>`, but without overhead. It is your responsibility to ensure
