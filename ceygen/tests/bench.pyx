@@ -122,6 +122,31 @@ class Bench(CeygenTestCase):
                         c.dot_mv(x, y, out)
 
     @benchmark
+    def test_bench_dot_mv_noout(self):
+        print
+        cdef int iterations
+        cdef double[:, :] x
+        cdef double[:] y
+
+        for size in self.sizes:
+            x_np = np.random.rand(size, size)
+            y_np = np.random.rand(size)
+            x, y = x_np, y_np
+
+            cost = 2. * size**2.
+            iterations = min(0.5 * 10.**9. / cost, 1000000)
+            print "size: {0}, iterations: {1}".format(size, iterations)
+
+            with timeit(b"dot_mv_noout", "numpy", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        np_dot(x_np, y_np)
+            with timeit(b"dot_mv_noout", "ceygen", locals()) as context:
+                if context.execute:
+                    for i in range(iterations):
+                        c.dot_mv(x, y)
+
+    @benchmark
     def test_bench_dot_vm(self):
         print
         cdef int iterations
