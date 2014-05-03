@@ -8,7 +8,8 @@ python:
 
 install:
   - sudo apt-get install -qq libeigen3-dev
-  - pip install cython --use-mirrors
+  - pip install cython==0.19.2 --use-mirrors
+  - cython --version
   # Python 3 environment on travis doesn't see python3-numpy package, install manually
   - if test ${TRAVIS_PYTHON_VERSION%%.*} = 3; then pip install numpy --use-mirrors; fi
 
