@@ -28,6 +28,7 @@ class timeit:
     def __init__(self, func, implementation, args):
         self.func, self.iterations, self.cost = func, args['iterations'], args['cost']
         self.stats = args['self'].stats
+        self.percall = args['self'].percall
         self.execute = True
         if implementation.startswith('numpy') and 'BENCHMARK_NUMPY' not in os.environ:
             self.execute = False
@@ -44,10 +45,13 @@ class timeit:
             gflops = self.cost/percall/10.**9
             print "{0}: {1:.2e}s per call, {2:.3f}s total, {3:5.2f} GFLOPS".format(
                 self.implementation, percall, self.elapsed, gflops)
-            if self.implementation.endswith('ceygen') and isinstance(self.stats, dict):
-                if self.func not in self.stats:
-                    self.stats[self.func] = []
-                self.stats[self.func].append(gflops)
+            if isinstance(self.stats, dict):
+                key = self.func + '.' + self.implementation.strip()
+                if key not in self.stats:
+                    self.stats[key] = []
+                    self.percall[key] = []
+                self.stats[key].append(gflops)
+                self.percall[key].append(percall)
         else:
             assert self.elapsed < 0.01
         return False  # let the exceptions fall through
@@ -61,17 +65,20 @@ class Bench(CeygenTestCase):
         self.sizes = (2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024)
         if 'SAVE' in os.environ:
             self.stats = {}
+            self.percall = {}
         else:
             self.stats = None
+            self.percall = None
 
     def tearDown(self):
         if self.stats:
             for (func, stats) in self.stats.iteritems():
+                percall = self.percall[func]
                 filename = func
                 filename += b'-' + subprocess.check_output(['git', 'describe', '--dirty']).strip()
                 filename += b'.pickle'
                 with open(filename, 'wb') as f:
-                    pickle.dump({'sizes': self.sizes, 'stats': stats}, f)
+                    pickle.dump({'sizes': self.sizes, 'stats': stats, 'percall': percall}, f)
                     print "Saved stats to {0}".format(filename)
 
     # core module
