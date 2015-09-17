@@ -53,16 +53,16 @@ cdef bint iinv(nonint_dtype[:, :] x) nogil except False:
 
 
 cdef void det_worker(
-        dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XMatrixContiguity x_dummy,
-        dtype *o) nogil:
-    cdef MatrixMap[dtype, XMatrixContiguity] x
+        nonint_dtype *x_data, Py_ssize_t *x_shape, Py_ssize_t *x_strides, XMatrixContiguity x_dummy,
+        nonint_dtype *o) nogil:
+    cdef MatrixMap[nonint_dtype, XMatrixContiguity] x
     x.init(x_data, x_shape, x_strides)
     o[0] = x.determinant()
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef dtype det(dtype[:, :] x) nogil except *:
-    cdef MSDispatcher[dtype] dispatcher
-    cdef dtype out
+cdef nonint_dtype det(nonint_dtype[:, :] x) nogil except *:
+    cdef MSDispatcher[nonint_dtype] dispatcher
+    cdef nonint_dtype out
     dispatcher.run(&x[0, 0], x.shape, x.strides, &out, det_worker, det_worker, det_worker)
     return out
