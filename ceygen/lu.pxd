@@ -9,4 +9,4 @@ from dtype cimport dtype, nonint_dtype
 cdef nonint_dtype[:, :] inv(nonint_dtype[:, :] x, nonint_dtype[:, :] out = *) nogil
 cdef bint iinv(nonint_dtype[:, :] x) nogil except False
 
-cdef dtype det(dtype[:, :] x) nogil except *
+cdef nonint_dtype det(nonint_dtype[:, :] x) nogil except *
